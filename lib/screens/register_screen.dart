@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wesurf/backend/user_data.dart';
 
+import 'home.dart';
 import 'login_screen.dart';
 
 class Register extends StatefulWidget {
@@ -193,6 +194,8 @@ class _MyHomePageState extends State<MyHomePage> {
               //     .updateOrAddUserName(nameController.text);
               await UserData(uid: user.uid)
                   .updateOrAddUserName(nameController.text);
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Home()));
             } on FirebaseAuthException catch (e) {
               if (e.code == 'weak-password') {
                 print('The password is weak');
