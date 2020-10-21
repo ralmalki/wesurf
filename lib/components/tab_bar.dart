@@ -7,6 +7,11 @@ import 'package:flutter_lorem/flutter_lorem.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:wesurf/backend/post_data.dart';
+import 'package:wesurf/backend/media_store.dart';
+import 'package:wesurf/backend/user_data.dart';
+
 import 'forecast_widget.dart';
 
 class TabBarWidget extends StatefulWidget {
@@ -45,6 +50,11 @@ class _TabBarWidgetState extends State<TabBarWidget> {
       print("error");
       return null;
     }
+  }
+
+  Future<Widget> fetchPost() async {
+    Firebase.initializeApp();
+
   }
 
   @override

@@ -4,8 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:wesurf/backend/post_data.dart';
+
 class CreateNewPost extends StatefulWidget {
-  // @override
+  CreateNewPost(this.locationUID);
+  final String locationUID;
+
+  @override
   CreateNewPostState createState() => CreateNewPostState();
 
   String upload_pic_path;
@@ -19,6 +29,9 @@ class CreateNewPost extends StatefulWidget {
 class CreateNewPostState extends State<CreateNewPost> {
   dynamic _image1, _image2, _image3, _image4, _image5, _image6;
   var image1, image2, image3, image4, image5, image6;
+
+  File testImage;
+  String mood;
 
   TextEditingController contentsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -62,44 +75,45 @@ class CreateNewPostState extends State<CreateNewPost> {
                     fontSize: 16,
                     color: Colors.black,
                     fontWeight: FontWeight.w700)),
-            leading: new Row(children: [
-              FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                textColor: Color(0xFF1A7EFF),
-                child: Row(children: [
-                  Icon(
-                    Icons.arrow_back_ios,
-                    size: 17,
-                    color: Color(0xFFFF1300),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text('Back',
-                      style: TextStyle(
-                          color: Color(0xFFFC2D54),
-                          fontWeight: FontWeight.w700))
-                ]),
-              ),
-            ]),
+            // leading: new Row(children: [
+            //   FlatButton(
+            //     onPressed: () {
+            //       Navigator.pop(context);
+            //     },
+            //     textColor: Color(0xFF1A7EFF),
+            //     child: Row(children: [
+            //       Icon(
+            //         Icons.arrow_back_ios,
+            //         size: 17,
+            //         color: Color(0xFFFF1300),
+            //       ),
+            //       SizedBox(
+            //         width: 5,
+            //       ),
+            //       Text('Back',
+            //           style: TextStyle(
+            //               color: Color(0xFFFC2D54),
+            //               fontWeight: FontWeight.w700))
+            //     ]),
+            //   ),
+            // ]),
             //leadingWidth: 90,
             backgroundColor: Colors.white,
             centerTitle: true,
             actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                textColor: Color(0xFF1A7EFF),
-                child: Row(children: [
-                  Text('Post',
-                      style: TextStyle(
-                          color: Color(0xFF1276FF),
-                          fontWeight: FontWeight.w700))
-                ]),
-              ),
+              _PostBtn()
+              // FlatButton(
+              //   onPressed: () {
+              //     // Navigator.pop(context);
+              //   },
+              //   textColor: Color(0xFF1A7EFF),
+              //   child: Row(children: [
+              //     Text('Post',
+              //         style: TextStyle(
+              //             color: Color(0xFF1276FF),
+              //             fontWeight: FontWeight.w700))
+              //   ]),
+              // ),
             ],
           ),
           body: Container(
@@ -190,13 +204,19 @@ class CreateNewPostState extends State<CreateNewPost> {
   }
 
   Widget _conditionIcon(
-      IconData icon, Color color, final ValueNotifier<bool> moodPressed) {
+      IconData icon, Color color, final ValueNotifier<bool> moodPressed, {String moodIcon}) {
     return ValueListenableBuilder(
         valueListenable: moodPressed,
         builder: (context, bool pressed, child) {
           return GestureDetector(
             onTap: () {
-              moodPressed.value = !moodPressed.value;
+              setState(() {
+                moodPressed.value = !moodPressed.value;
+                if (moodIcon != null) {
+                  mood = moodIcon;
+                }
+                print(mood);
+              });
             },
             child: Container(
               child: new Icon(
@@ -271,17 +291,17 @@ class CreateNewPostState extends State<CreateNewPost> {
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick),
+                  TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick, moodIcon: 'mood_happy'),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_neutral, Color(0XFFFE9E12), how_sadClick),
+                  TablerIcons.mood_neutral, Color(0XFFFE9E12), how_sadClick, moodIcon: 'mood_neutral'),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, how_neutralClick),
+                  TablerIcons.mood_sad, Colors.redAccent, how_neutralClick, moodIcon: 'mood_sad'),
             )),
           ]),
           TableRow(children: [
@@ -395,9 +415,10 @@ class CreateNewPostState extends State<CreateNewPost> {
         ),
         onPressed: () {
           setState(() {
-            debugPrint("Post button clicked");
+            print("Post button clicked");
             _postBtn();
           });
+          // _postBtn();
         },
       ),
     );
@@ -407,6 +428,7 @@ class CreateNewPostState extends State<CreateNewPost> {
     image1 = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image1 = image1;
+      //testImage = File(_image1);
     });
   }
 
@@ -739,21 +761,41 @@ class CreateNewPostState extends State<CreateNewPost> {
     )));
   }
 
-  void moveToLastScreen() {
-    Navigator.pop(context, true);
-  }
+  // void moveToLastScreen() {
+  //   Navigator.pop(context, true);
+  // }
 
-  // Update the title of todo object
-  void updateTitle() {
-    //forumPost.username = contentsController.text;
-  }
+  // // Update the title of todo object
+  // void updateTitle() {
+  //   //forumPost.username = contentsController.text;
+  // }
 
   // Save data to database
   void _postBtn() async {
-    moveToLastScreen();
+    await Firebase.initializeApp();
+
+    //-----testing
+    String fileName = path.basename(image1.path);
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
+    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+    var url  = await taskSnapshot.ref.getDownloadURL();
+    String imageURL = url.toString();
+    // taskSnapshot.ref.getDownloadURL().then(
+    //     (value) => imageURL = value
+    // );
+    print(imageURL);
+
+    //----------------
+    String userUID = FirebaseAuth.instance.currentUser.uid;
+    PostData postData = new PostData(locationUID: widget.locationUID);
+    String postUID = await postData.createPost(userUID, contentsController.text, imageURL, mood);
+    postData.addPost(postUID);
+
+    Navigator.pop(context, true);
   }
 
   void _cancelBtn() async {
-    moveToLastScreen();
+    Navigator.pop(context, true);
   }
 }
