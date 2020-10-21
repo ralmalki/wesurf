@@ -15,7 +15,8 @@ import 'package:wesurf/backend/user_data.dart';
 import 'forecast_widget.dart';
 
 class TabBarWidget extends StatefulWidget {
-  TabBarWidget(this.lat, this.long);
+  TabBarWidget(this.id, this.lat, this.long);
+  final id;
   final lat;
   final long;
 
@@ -52,7 +53,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     }
   }
 
-  Future<Widget> fetchPost() async {
+  Future<Widget> fetchPost(String postUID) async {
     Firebase.initializeApp();
 
   }

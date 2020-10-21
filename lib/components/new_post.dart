@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:wesurf/backend/post_data.dart';
+import 'package:wesurf/backend/location_data.dart';
 
 class CreateNewPost extends StatefulWidget {
   CreateNewPost(this.locationUID);
@@ -788,9 +789,10 @@ class CreateNewPostState extends State<CreateNewPost> {
 
     //----------------
     String userUID = FirebaseAuth.instance.currentUser.uid;
-    PostData postData = new PostData(locationUID: widget.locationUID);
-    String postUID = await postData.createPost(userUID, contentsController.text, imageURL, mood);
-    postData.addPost(postUID);
+    LocationData locationData = new LocationData(locationUID: widget.locationUID);
+    PostData postData = new PostData();
+    String postUID = await postData.createPost(userUID, widget.locationUID, contentsController.text, imageURL, mood);
+    locationData.addPost(postUID);
 
     Navigator.pop(context, true);
   }

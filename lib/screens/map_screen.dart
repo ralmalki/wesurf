@@ -70,6 +70,7 @@ class _MapScreenState extends State<MapScreen> {
             //icon: setCustomMapPin(color);
             onTap: () {
               print(location.get('name'));
+              print(location.id);
               print("lat: ${geo.latitude}, long: ${geo.longitude}");
               _showModalBottomBox(
                   context, location.id, geo.latitude, geo.longitude);

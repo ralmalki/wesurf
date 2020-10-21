@@ -217,7 +217,7 @@ class WeatherInformation extends StatelessWidget {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Center(child: TabBarWidget(lat, long)),
+                                  child: Center(child: TabBarWidget(id, lat, long)),
                                 )
                               ],
                             ),

@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostData {
-  PostData({this.locationUID});
-  final String locationUID;
+  PostData({this.postUID});
+  final String postUID;
 
   final CollectionReference postCollection =
       FirebaseFirestore.instance.collection('posts');
-  final CollectionReference locationCollection =
-      FirebaseFirestore.instance.collection('locations');
 
-  Future<String> createPost(String userUID, String content, String imageURL, String mood) async {
+  Future<String> createPost(String userUID, String locationUID, String content, String imageURL, String mood) async {
     //record the current time as post uid to link with location
     //also can be used to record time later on
     String timestamp = DateTime.now().toString();
@@ -25,12 +23,8 @@ class PostData {
     return postUID;
   }
 
-  Future addPost(String postUID) async {
-    return await locationCollection
-        .doc(locationUID)
-        .update({
-          'posts': FieldValue.arrayUnion([postUID])
-    });
+  Future getPostOwner() async {
+    // return await postCollection.doc()
   }
 
 }
