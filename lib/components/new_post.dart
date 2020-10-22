@@ -4,45 +4,58 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as path;
-
-import 'package:wesurf/backend/post_data.dart';
-import 'package:wesurf/backend/location_data.dart';
-
 class CreateNewPost extends StatefulWidget {
-  CreateNewPost(this.locationUID);
-  final String locationUID;
-
-  @override
+  // @override
   CreateNewPostState createState() => CreateNewPostState();
-
-  String upload_pic_path;
-  String post_contents;
-  String surf_condition;
-  String wave_height;
-  String wind_speed;
-  String crowd_level;
 }
 
 class CreateNewPostState extends State<CreateNewPost> {
   dynamic _image1, _image2, _image3, _image4, _image5, _image6;
   var image1, image2, image3, image4, image5, image6;
 
-  File testImage;
-  String mood;
-
   TextEditingController contentsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   String upload_pic_path;
   String post_contents;
-  String surf_condition;
-  String wave_height;
-  String wind_speed;
-  String crowd_level;
+     String selected_how_mood = "empty";
+  String selected_surf_mood = "empty";
+  String selected_wave_mood = "empty";
+  String selected_wind_mood = "empty";
+  String selected_crowd_mood = "empty";
+
+ 
+  bool how_happy_stat = false;
+  bool how_sad_stat = false;
+  bool how_neutral_stat = false;
+  bool surf_happy_stat = false; 
+  bool surf_sad_stat = false;
+   bool surf_neutral_stat = false;
+  bool wave_happy_stat = false;
+  bool wave_sad_stat = false;
+  bool wave_neutral_stat = false; 
+  bool wind_sad_stat = false;
+   bool wind_happy_stat = false;
+  bool wind_neutral_stat = false;
+  bool crowd_happy_stat = false;
+  bool crowd_sad_stat = false; 
+  bool crowd_neutral_stat = false;
+
+  String how_happy = "how_happy"; 
+  String how_sad = "how_sad";
+  String how_neutral = "how_neutral";
+  String surf_happy="surf_happy";
+  String surf_sad = "surf_sad";
+  String surf_neutral= "surf_neutral";
+  String wave_happy="wave_happy";
+  String wave_sad="wave_sad";
+  String wave_neutral="wave_neutral";
+  String wind_happy="wind_happy";
+  String wind_sad="wind_sad";
+  String wind_neutral="wind_neutral";
+  String crowd_happy = "crowd_happy";
+  String crowd_sad="crowd_sad";
+  String crowd_neutral="crowd_neutral";
 
   final ValueNotifier<bool> how_happyClick = ValueNotifier(false);
   final ValueNotifier<bool> how_sadClick = ValueNotifier(false);
@@ -76,45 +89,44 @@ class CreateNewPostState extends State<CreateNewPost> {
                     fontSize: 16,
                     color: Colors.black,
                     fontWeight: FontWeight.w700)),
-            // leading: new Row(children: [
-            //   FlatButton(
-            //     onPressed: () {
-            //       Navigator.pop(context);
-            //     },
-            //     textColor: Color(0xFF1A7EFF),
-            //     child: Row(children: [
-            //       Icon(
-            //         Icons.arrow_back_ios,
-            //         size: 17,
-            //         color: Color(0xFFFF1300),
-            //       ),
-            //       SizedBox(
-            //         width: 5,
-            //       ),
-            //       Text('Back',
-            //           style: TextStyle(
-            //               color: Color(0xFFFC2D54),
-            //               fontWeight: FontWeight.w700))
-            //     ]),
-            //   ),
-            // ]),
-            //leadingWidth: 90,
+            leading: new Row(children: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                textColor: Color(0xFF1A7EFF),
+                child: Row(children: [
+                  Icon(
+                    Icons.arrow_back_ios,
+                    size: 17,
+                    color: Color(0xFFFF1300),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Back',
+                      style: TextStyle(
+                          color: Color(0xFFFC2D54),
+                          fontWeight: FontWeight.w700))
+                ]),
+              ),
+            ]),
+            leadingWidth: 89,
             backgroundColor: Colors.white,
             centerTitle: true,
             actions: <Widget>[
-              _PostBtn()
-              // FlatButton(
-              //   onPressed: () {
-              //     // Navigator.pop(context);
-              //   },
-              //   textColor: Color(0xFF1A7EFF),
-              //   child: Row(children: [
-              //     Text('Post',
-              //         style: TextStyle(
-              //             color: Color(0xFF1276FF),
-              //             fontWeight: FontWeight.w700))
-              //   ]),
-              // ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                textColor: Color(0xFF1A7EFF),
+                child: Row(children: [
+                  Text('Post',
+                      style: TextStyle(
+                          color: Color(0xFF1276FF),
+                          fontWeight: FontWeight.w700))
+                ]),
+              ),
             ],
           ),
           body: Container(
@@ -204,54 +216,254 @@ class CreateNewPostState extends State<CreateNewPost> {
         ));
   }
 
-  Widget _conditionIcon(
-      IconData icon, Color color, final ValueNotifier<bool> moodPressed, {String moodIcon}) {
-    return ValueListenableBuilder(
-        valueListenable: moodPressed,
-        builder: (context, bool pressed, child) {
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                moodPressed.value = !moodPressed.value;
-                if (moodIcon != null) {
-                  mood = moodIcon;
-                }
-                print(mood);
-              });
-            },
-            child: Container(
-              child: new Icon(
-                icon,
-                size: 23,
-                color: moodPressed.value ? color : Colors.black,
-              ),
-            ),
-          );
-        });
-  }
+  Widget _conditionIcon(IconData icon, Color color, final ValueNotifier<bool> moodPressed, bool btnStat, String btnType) 
+  {
+    bool Clickable  = false;
 
-  Widget _conditionsBtn(String btnStr, int btnColor, double btnWidth) {
-    return Padding(
-        padding: EdgeInsets.only(left: 5, right: 5, top: 10),
-        child: SizedBox(
-          width: 70,
-          height: 30,
-          child: RaisedButton(
-            onPressed: () {
-              print('Button Clicked');
-            },
-            child: Text(btnStr),
-            color: Colors.white,
-            textColor: Color(btnColor),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-                side: BorderSide(
-                  color: Color(btnColor),
-                  width: 1,
-                )),
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          ),
-        ));
+    return GestureDetector
+    (
+      child: Container(
+        child: new Icon(
+          icon,
+          size: 23,
+          color: moodPressed.value ? color : Colors.black,
+      )),
+      onTap: () 
+      {
+        setState(() 
+        {
+            if(btnType=="how_happy")
+            {
+              if(how_sad_stat == false && how_neutral_stat == false)
+              {
+                how_happy_stat = !how_happy_stat;
+                Clickable = true;
+              }else if(how_sad_stat == true || how_neutral_stat == true){
+                Clickable = false;
+              }
+            }else if(btnType=="how_sad")
+            { 
+              if(how_happy_stat == false && how_neutral_stat == false)
+              {
+                how_sad_stat = ! how_sad_stat;
+
+                Clickable = true;
+              }else if(how_happy_stat == true || how_neutral_stat == true)
+              {  
+                Clickable = false;
+              }
+            }else if(btnType=="how_neutral")
+            {
+              if(how_happy_stat == false && how_sad_stat == false)
+              {
+                how_neutral_stat =  !how_neutral_stat;
+
+                Clickable = true;
+              }else if(how_happy_stat == true || how_sad_stat == true)
+              {
+                Clickable = false;
+              }
+            }
+
+            if(btnType=="surf_happy")
+            {
+              if(surf_sad_stat == false && surf_neutral_stat == false)
+              {
+                surf_happy_stat = !surf_happy_stat;
+                Clickable = true;
+              }else if(surf_sad_stat == true || surf_neutral_stat == true){
+                Clickable = false;
+              }
+            }else if(btnType=="surf_sad")
+            { 
+              if(surf_happy_stat == false && surf_neutral_stat == false)
+              {
+                surf_sad_stat = ! surf_sad_stat;
+
+                Clickable = true;
+              }else if(surf_happy_stat == true || surf_neutral_stat == true)
+              {  
+                Clickable = false;
+              }
+            }else if(btnType=="surf_neutral")
+            {
+              if(surf_happy_stat == false && surf_sad_stat == false)
+              {
+                surf_neutral_stat =  !surf_neutral_stat;
+
+                Clickable = true;
+              }else if(surf_happy_stat == true || surf_sad_stat == true)
+              {
+                Clickable = false;
+              }
+            }
+
+            if(btnType=="wave_happy")
+            {
+              if(wave_sad_stat == false && wave_neutral_stat == false)
+              {
+                wave_happy_stat = !wave_happy_stat;
+                Clickable = true;
+              }else if(wave_sad_stat == true || wave_neutral_stat == true){
+                Clickable = false;
+              }
+            }else if(btnType=="wave_sad")
+            { 
+              if(wave_happy_stat == false && wave_neutral_stat == false)
+              {
+                wave_sad_stat = ! wave_sad_stat;
+
+                Clickable = true;
+              }else if(wave_happy_stat == true || wave_neutral_stat == true)
+              {  
+                Clickable = false;
+              }
+            }else if(btnType=="wave_neutral")
+            {
+              if(wave_happy_stat == false && wave_sad_stat == false)
+              {
+                wave_neutral_stat =  !wave_neutral_stat;
+                Clickable = true;
+              }else if(wave_happy_stat == true || wave_sad_stat == true)
+              {
+                Clickable = false;
+              }
+            }
+
+             if(btnType=="wind_happy")
+            {
+              if(wind_sad_stat == false && wind_neutral_stat == false)
+              {
+                wind_happy_stat = !wind_happy_stat;
+                Clickable = true;
+              }else if(wind_sad_stat == true || wind_neutral_stat == true){
+                Clickable = false;
+              }
+            }else if(btnType=="wind_sad")
+            { 
+              if(wind_happy_stat == false && wind_neutral_stat == false)
+              {
+                wind_sad_stat = ! wind_sad_stat;
+
+                Clickable = true;
+              }else if(wind_happy_stat == true || wind_neutral_stat == true)
+              {  
+                Clickable = false;
+              }
+            }else if(btnType=="wind_neutral")
+            {
+              if(wind_happy_stat == false && wind_sad_stat == false)
+              {
+                wind_neutral_stat =  !wind_neutral_stat;
+                Clickable = true;
+              }else if(wind_happy_stat == true || wind_sad_stat == true)
+              {
+                Clickable = false;
+              }
+            }
+
+             if(btnType=="crowd_happy")
+            {
+              if(crowd_sad_stat == false && crowd_neutral_stat == false)
+              {
+                crowd_happy_stat = !crowd_happy_stat;
+                Clickable = true;
+              }else if(crowd_sad_stat == true || crowd_neutral_stat == true){
+                Clickable = false;
+              }
+            }else if(btnType=="crowd_sad")
+            { 
+              if(crowd_happy_stat == false && crowd_neutral_stat == false)
+              {
+                crowd_sad_stat = ! crowd_sad_stat;
+
+                Clickable = true;
+              }else if(crowd_happy_stat == true || crowd_neutral_stat == true)
+              {  
+                Clickable = false;
+              }
+            }else if(btnType=="crowd_neutral")
+            {
+              if(crowd_happy_stat == false && crowd_sad_stat == false)
+              {
+                crowd_neutral_stat =  !crowd_neutral_stat;
+                Clickable = true;
+              }else if(crowd_happy_stat == true || crowd_sad_stat == true)
+              {
+                Clickable = false;
+              }
+            }
+
+            if(Clickable == true)
+            {
+                moodPressed.value = !moodPressed.value;
+            }
+
+            if(how_happy_stat==true)
+            {
+              selected_how_mood = "happy";
+            }else if(how_sad_stat==true)
+            {
+              selected_how_mood = "sad";
+            }else if(how_neutral_stat==true)
+            {
+              selected_how_mood = "neutral";
+            }
+
+            if(surf_happy_stat==true)
+            {
+              selected_surf_mood = "happy";
+            }else if(surf_sad_stat==true)
+            {
+              selected_surf_mood = "sad";
+            }else if(surf_neutral_stat==true)
+            {
+              selected_surf_mood = "neutral";
+            }
+
+            if(wave_happy_stat==true)
+            {
+              selected_wave_mood = "happy";
+            }else if(wave_sad_stat==true)
+            {
+              selected_wave_mood = "sad";
+            }else if(wave_neutral_stat==true)
+            {
+              selected_wave_mood = "neutral";
+            }
+
+                    if(wind_happy_stat==true)
+            {
+              selected_wind_mood = "happy";
+            }else if(wind_sad_stat==true)
+            {
+              selected_wind_mood = "sad";
+            }else if(wind_neutral_stat==true)
+            {
+              selected_wind_mood = "neutral";
+            }
+
+            if(crowd_happy_stat==true)
+            {
+              selected_crowd_mood = "happy";
+            }else if(crowd_sad_stat==true)
+            {
+              selected_crowd_mood = "sad";
+            }else if(crowd_neutral_stat==true)
+            {
+              selected_crowd_mood = "neutral";
+            }
+            print("selected_how_mood: " + selected_how_mood);
+            print("selected_surf_mood: " + selected_surf_mood);
+            print("selected_wave_mood: " + selected_wave_mood);
+            print("selected_wind_mood: " + selected_wind_mood);
+            print("selected_crowd_mood: " + selected_crowd_mood);
+        });
+      }
+        
+      
+      );
+  
   }
 
   Widget _conditionText(String str) {
@@ -262,7 +474,7 @@ class CreateNewPostState extends State<CreateNewPost> {
               color: Colors.black,
               fontSize: 13,
               //fontWeight: FontWeight.w500
-            )));
+    )));
   }
 
   Widget _surfConditionTable() {
@@ -291,87 +503,79 @@ class CreateNewPostState extends State<CreateNewPost> {
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick, moodIcon: 'mood_happy'),
+               child: _conditionIcon( TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick,how_happy_stat, how_happy,),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_neutral, Color(0XFFFE9E12), how_sadClick, moodIcon: 'mood_neutral'),
+                   TablerIcons.mood_neutral, Color(0XFFFE9E12), how_neutralClick,how_neutral_stat,how_neutral),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, how_neutralClick, moodIcon: 'mood_sad'),
+                  TablerIcons.mood_neutral, Colors.redAccent, how_sadClick,how_sad_stat,how_sad),
+
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Surf condition\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), surf_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy, Color(0XFF52DB69), surf_happyClick,surf_happy_stat, surf_happy,),
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_neutral, Color(0XFFFE9E12), surf_sadClick),
+                  child: _conditionIcon( TablerIcons.mood_neutral, Color(0XFFFE9E12), surf_neutralClick,surf_neutral_stat, surf_neutral,),
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, surf_neutralClick),
+                  child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, surf_sadClick,surf_sad_stat, surf_sad,),
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Wave height\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), wave_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), wave_happyClick,wave_happy_stat, wave_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), wave_sadClick))),
+                    child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), wave_neutralClick,wave_neutral_stat, wave_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, wave_neutralClick),
+                    child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, wave_sadClick,wave_sad_stat, wave_sad,),
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Wind speed\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), wind_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), wind_happyClick,wind_happy_stat, wind_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), wind_sadClick))),
+                   child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), wind_neutralClick,wind_neutral_stat, wind_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, wind_neutralClick),
+                   child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, wind_sadClick,wind_sad_stat, wind_sad,),
+
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Crowd level\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), crowd_happyClick),
+                    child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), crowd_happyClick,crowd_happy_stat, crowd_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), crowd_sadClick))),
+                    child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), crowd_neutralClick,crowd_neutral_stat, crowd_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, crowd_neutralClick),
+                    child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, crowd_sadClick,crowd_sad_stat, crowd_sad,),
             )),
           ]),
         ],
@@ -416,10 +620,9 @@ class CreateNewPostState extends State<CreateNewPost> {
         ),
         onPressed: () {
           setState(() {
-            print("Post button clicked");
+            debugPrint("Post button clicked");
             _postBtn();
           });
-          // _postBtn();
         },
       ),
     );
@@ -429,7 +632,6 @@ class CreateNewPostState extends State<CreateNewPost> {
     image1 = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image1 = image1;
-      //testImage = File(_image1);
     });
   }
 
@@ -762,42 +964,21 @@ class CreateNewPostState extends State<CreateNewPost> {
     )));
   }
 
-  // void moveToLastScreen() {
-  //   Navigator.pop(context, true);
-  // }
-
-  // // Update the title of todo object
-  // void updateTitle() {
-  //   //forumPost.username = contentsController.text;
-  // }
-
-  // Save data to database
-  void _postBtn() async {
-    await Firebase.initializeApp();
-
-    //-----testing
-    String fileName = path.basename(image1.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
-    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-    var url  = await taskSnapshot.ref.getDownloadURL();
-    String imageURL = url.toString();
-    // taskSnapshot.ref.getDownloadURL().then(
-    //     (value) => imageURL = value
-    // );
-    print(imageURL);
-
-    //----------------
-    String userUID = FirebaseAuth.instance.currentUser.uid;
-    LocationData locationData = new LocationData(locationUID: widget.locationUID);
-    PostData postData = new PostData();
-    String postUID = await postData.createPost(userUID, widget.locationUID, contentsController.text, imageURL, mood);
-    locationData.addPost(postUID);
-
+  void moveToLastScreen() {
     Navigator.pop(context, true);
   }
 
+  // Update the title of todo object
+  void updateTitle() {
+    //forumPost.username = contentsController.text;
+  }
+
+  // Save data to database
+  void _postBtn() async {
+    moveToLastScreen();
+  }
+
   void _cancelBtn() async {
-    Navigator.pop(context, true);
+    moveToLastScreen();
   }
 }
