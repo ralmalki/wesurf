@@ -3,8 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:wesurf/backend/post_data.dart';
+import 'package:wesurf/backend/location_data.dart';
 
 class CreateNewPost extends StatefulWidget {
+  CreateNewPost(this.locationUID);
+  final String locationUID;
   // @override
   CreateNewPostState createState() => CreateNewPostState();
 }
@@ -12,6 +21,9 @@ class CreateNewPost extends StatefulWidget {
 class CreateNewPostState extends State<CreateNewPost> {
   dynamic _image1, _image2, _image3, _image4, _image5, _image6;
   var image1, image2, image3, image4, image5, image6;
+
+  File testImage;
+  String mood;
 
   TextEditingController contentsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -975,10 +987,31 @@ class CreateNewPostState extends State<CreateNewPost> {
 
   // Save data to database
   void _postBtn() async {
-    moveToLastScreen();
+    await Firebase.initializeApp();
+
+    //-----testing
+    String fileName = path.basename(image1.path);
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
+    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+    var url  = await taskSnapshot.ref.getDownloadURL();
+    String imageURL = url.toString();
+    // taskSnapshot.ref.getDownloadURL().then(
+    //     (value) => imageURL = value
+    // );
+    print(imageURL);
+
+    //----------------
+    String userUID = FirebaseAuth.instance.currentUser.uid;
+    LocationData locationData = new LocationData(locationUID: widget.locationUID);
+    PostData postData = new PostData();
+    String postUID = await postData.createPost(userUID, widget.locationUID, contentsController.text, imageURL, mood);
+    locationData.addPost(postUID);
+
+    Navigator.pop(context, true);
   }
 
   void _cancelBtn() async {
-    moveToLastScreen();
-  }
+    Navigator.pop(context, true);
+}
 }
