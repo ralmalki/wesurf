@@ -246,236 +246,114 @@ class CreateNewPostState extends State<CreateNewPost> {
         {
             if(btnType=="how_happy")
             {
-              if(how_sad_stat == false && how_neutral_stat == false)
-              {
-                how_happy_stat = !how_happy_stat;
-                Clickable = true;
-              }else if(how_sad_stat == true || how_neutral_stat == true){
-                Clickable = false;
-              }
+              how_happyClick.value = true;
+              how_neutralClick.value = false;
+              how_sadClick.value = false;
+              selected_how_mood = "happy";
+            
             }else if(btnType=="how_sad")
             { 
-              if(how_happy_stat == false && how_neutral_stat == false)
-              {
-                how_sad_stat = ! how_sad_stat;
-
-                Clickable = true;
-              }else if(how_happy_stat == true || how_neutral_stat == true)
-              {  
-                Clickable = false;
-              }
+              how_sadClick.value = true;
+              how_neutralClick.value = false;
+              how_happyClick.value = false;
+              selected_how_mood = "sad";
+             
             }else if(btnType=="how_neutral")
             {
-              if(how_happy_stat == false && how_sad_stat == false)
-              {
-                how_neutral_stat =  !how_neutral_stat;
-
-                Clickable = true;
-              }else if(how_happy_stat == true || how_sad_stat == true)
-              {
-                Clickable = false;
-              }
+              how_sadClick.value = false;
+              how_neutralClick.value = true;
+              how_happyClick.value = false;
+              selected_how_mood = "neutral";
             }
 
             if(btnType=="surf_happy")
             {
-              if(surf_sad_stat == false && surf_neutral_stat == false)
-              {
-                surf_happy_stat = !surf_happy_stat;
-                Clickable = true;
-              }else if(surf_sad_stat == true || surf_neutral_stat == true){
-                Clickable = false;
-              }
+              surf_sadClick.value = false;
+              surf_neutralClick.value = false;
+              surf_happyClick.value = true;
+              selected_surf_mood = "happy";
             }else if(btnType=="surf_sad")
             { 
-              if(surf_happy_stat == false && surf_neutral_stat == false)
-              {
-                surf_sad_stat = ! surf_sad_stat;
-
-                Clickable = true;
-              }else if(surf_happy_stat == true || surf_neutral_stat == true)
-              {  
-                Clickable = false;
-              }
+              surf_sadClick.value = true;
+              surf_neutralClick.value = false;
+              surf_happyClick.value = false;
+              selected_surf_mood = "sad";
             }else if(btnType=="surf_neutral")
             {
-              if(surf_happy_stat == false && surf_sad_stat == false)
-              {
-                surf_neutral_stat =  !surf_neutral_stat;
-
-                Clickable = true;
-              }else if(surf_happy_stat == true || surf_sad_stat == true)
-              {
-                Clickable = false;
-              }
+              surf_sadClick.value = false;
+              surf_neutralClick.value = true;
+              surf_happyClick.value = false;
+              selected_surf_mood = "neutral";
             }
 
             if(btnType=="wave_happy")
             {
-              if(wave_sad_stat == false && wave_neutral_stat == false)
-              {
-                wave_happy_stat = !wave_happy_stat;
-                Clickable = true;
-              }else if(wave_sad_stat == true || wave_neutral_stat == true){
-                Clickable = false;
-              }
+              wave_sadClick.value = false;
+              wave_neutralClick.value = false;
+              wave_happyClick.value = true;
+              selected_wave_mood = "happy";
             }else if(btnType=="wave_sad")
             { 
-              if(wave_happy_stat == false && wave_neutral_stat == false)
-              {
-                wave_sad_stat = ! wave_sad_stat;
-
-                Clickable = true;
-              }else if(wave_happy_stat == true || wave_neutral_stat == true)
-              {  
-                Clickable = false;
-              }
+              wave_sadClick.value = true;
+              wave_neutralClick.value = false;
+              wave_happyClick.value = false;
+              selected_wave_mood = "sad";
             }else if(btnType=="wave_neutral")
             {
-              if(wave_happy_stat == false && wave_sad_stat == false)
-              {
-                wave_neutral_stat =  !wave_neutral_stat;
-                Clickable = true;
-              }else if(wave_happy_stat == true || wave_sad_stat == true)
-              {
-                Clickable = false;
-              }
+              wave_sadClick.value = false;
+              wave_neutralClick.value = true;
+              wave_happyClick.value = false;
+              selected_wave_mood = "neutral";
             }
 
              if(btnType=="wind_happy")
             {
-              if(wind_sad_stat == false && wind_neutral_stat == false)
-              {
-                wind_happy_stat = !wind_happy_stat;
-                Clickable = true;
-              }else if(wind_sad_stat == true || wind_neutral_stat == true){
-                Clickable = false;
-              }
+              wind_sadClick.value = false;
+              wind_neutralClick.value = false;
+              wind_happyClick.value = true;
+              selected_wind_mood = "happy";
             }else if(btnType=="wind_sad")
             { 
-              if(wind_happy_stat == false && wind_neutral_stat == false)
-              {
-                wind_sad_stat = ! wind_sad_stat;
-
-                Clickable = true;
-              }else if(wind_happy_stat == true || wind_neutral_stat == true)
-              {  
-                Clickable = false;
-              }
+              wind_sadClick.value = true;
+              wind_neutralClick.value = false;
+              wind_happyClick.value = false;
+              selected_wind_mood = "sad";
             }else if(btnType=="wind_neutral")
             {
-              if(wind_happy_stat == false && wind_sad_stat == false)
-              {
-                wind_neutral_stat =  !wind_neutral_stat;
-                Clickable = true;
-              }else if(wind_happy_stat == true || wind_sad_stat == true)
-              {
-                Clickable = false;
-              }
+              wind_sadClick.value = false;
+              wind_neutralClick.value = true;
+              wind_happyClick.value = false;
+              selected_wind_mood = "neutral";
             }
 
              if(btnType=="crowd_happy")
             {
-              if(crowd_sad_stat == false && crowd_neutral_stat == false)
-              {
-                crowd_happy_stat = !crowd_happy_stat;
-                Clickable = true;
-              }else if(crowd_sad_stat == true || crowd_neutral_stat == true){
-                Clickable = false;
-              }
+              crowd_sadClick.value = false;
+              crowd_neutralClick.value = false;
+              crowd_happyClick.value = true;
+              selected_crowd_mood = "happy";
             }else if(btnType=="crowd_sad")
             { 
-              if(crowd_happy_stat == false && crowd_neutral_stat == false)
-              {
-                crowd_sad_stat = ! crowd_sad_stat;
-
-                Clickable = true;
-              }else if(crowd_happy_stat == true || crowd_neutral_stat == true)
-              {  
-                Clickable = false;
-              }
+              crowd_sadClick.value = true;
+              crowd_neutralClick.value = false;
+              crowd_happyClick.value = false;
+              selected_crowd_mood = "sad";
             }else if(btnType=="crowd_neutral")
             {
-              if(crowd_happy_stat == false && crowd_sad_stat == false)
-              {
-                crowd_neutral_stat =  !crowd_neutral_stat;
-                Clickable = true;
-              }else if(crowd_happy_stat == true || crowd_sad_stat == true)
-              {
-                Clickable = false;
-              }
-            }
-
-            if(Clickable == true)
-            {
-                moodPressed.value = !moodPressed.value;
-            }
-
-            if(how_happy_stat==true)
-            {
-              selected_how_mood = "happy";
-            }else if(how_sad_stat==true)
-            {
-              selected_how_mood = "sad";
-            }else if(how_neutral_stat==true)
-            {
-              selected_how_mood = "neutral";
-            }
-
-            if(surf_happy_stat==true)
-            {
-              selected_surf_mood = "happy";
-            }else if(surf_sad_stat==true)
-            {
-              selected_surf_mood = "sad";
-            }else if(surf_neutral_stat==true)
-            {
-              selected_surf_mood = "neutral";
-            }
-
-            if(wave_happy_stat==true)
-            {
-              selected_wave_mood = "happy";
-            }else if(wave_sad_stat==true)
-            {
-              selected_wave_mood = "sad";
-            }else if(wave_neutral_stat==true)
-            {
-              selected_wave_mood = "neutral";
-            }
-
-                    if(wind_happy_stat==true)
-            {
-              selected_wind_mood = "happy";
-            }else if(wind_sad_stat==true)
-            {
-              selected_wind_mood = "sad";
-            }else if(wind_neutral_stat==true)
-            {
-              selected_wind_mood = "neutral";
-            }
-
-            if(crowd_happy_stat==true)
-            {
-              selected_crowd_mood = "happy";
-            }else if(crowd_sad_stat==true)
-            {
-              selected_crowd_mood = "sad";
-            }else if(crowd_neutral_stat==true)
-            {
+              crowd_sadClick.value = false;
+              crowd_neutralClick.value = true;
+              crowd_happyClick.value = false;
               selected_crowd_mood = "neutral";
             }
+
             print("selected_how_mood: " + selected_how_mood);
             print("selected_surf_mood: " + selected_surf_mood);
             print("selected_wave_mood: " + selected_wave_mood);
             print("selected_wind_mood: " + selected_wind_mood);
             print("selected_crowd_mood: " + selected_crowd_mood);
         });
-      }
-        
-      
+      }      
       );
-  
   }
 
   Widget _conditionText(String str) {
