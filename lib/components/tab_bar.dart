@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_lorem/flutter_lorem.dart';
 
 //import '../backend/network.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -28,13 +30,14 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   bool tapped = false;
   TextEditingController commentController = TextEditingController();
   String appid = "1e884f92b81b9b1eb0c42487fe6e1584";
-  Icon mood_happy =
-      Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
 
-  Icon mood_neutral =
-      Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
-
-  Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
+  // Icon mood_happy =
+  //     Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
+  //
+  // Icon mood_neutral =
+  //     Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
+  //
+  // Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
 
   double lat;
   double long;
@@ -53,9 +56,76 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     }
   }
 
-  Future<Widget> fetchPost(String postUID) async {
-    Firebase.initializeApp();
+  String timeFromNow(String t) {
+    DateTime timestamp = DateTime.parse(t);
+    Duration duration = DateTime.now().difference(timestamp);
+    if (duration.inSeconds > 60) {
+      if (duration.inMinutes > 60) {
+        if (duration.inHours > 24) {
+          return '${duration.inDays} days ago';
+        }
+        else
+          return '${duration.inHours} hours ago';
+      }
+      else
+        return '${duration.inMinutes} minutes ago';
+    }
+    return 'Just now';
+  }
 
+  Widget getMood(String mood) {
+    if (mood == 'mood_happy')
+      return Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
+    else if (mood == 'mood_neutral')
+      return Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
+    return Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
+  }
+
+  Future<List<Widget>> fetchPost(String locationUID) async {
+    Firebase.initializeApp();
+    var locationInstance = FirebaseFirestore.instance.collection('locations');
+    var postInstance = FirebaseFirestore.instance.collection('posts');
+    var userInstance = FirebaseFirestore.instance.collection('users');
+
+    String locationName;
+    String content;
+    var image;
+    String mood;
+    var timestamp;
+    String userName;
+
+    List<Widget> ForumCards = new List<Widget>();
+    //fetch all post
+    await locationInstance.doc(locationUID).get().then((value) async {
+      locationName = value.data()['name'];
+      //for each post fetch data
+      for (var post in value.data()['posts']) {
+          await postInstance.doc(post).get().then((postValue) async{
+            content = postValue.data()['content'];
+            image = postValue.data()['image'];
+            mood = postValue.data()['mood'];
+            timestamp = postValue.data()['timestamp'];
+            String userUID = postValue.data()['userUID'];
+            //for useUID fetch name
+            await userInstance.doc(userUID).get().then((userValue) => userName = userValue.data()['name']);
+          });
+          // print('location: $locationName');
+          // print('content: $content');
+          // print('image: ${image.toString()}');
+          // print('mood: $mood');
+          // print('timestamp: ${timestamp.toString()}');
+          // print('user: $userName');
+          ForumCards.add(_ForumCard(
+              content,
+              userName,
+              'assets/profile_pic.png',
+              image,
+              locationName,
+              timeFromNow(timestamp),
+              getMood(mood)));
+      }
+    });
+    return ForumCards;
   }
 
   @override
@@ -290,24 +360,40 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   }
 
   Widget _myListView(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
-            "Towradgi Beach", "2h", mood_happy),
-        _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
-            'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_neutral),
-        _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
-            "Towradgi Beach", "2", mood_sad),
-        _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
-            'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_happy),
-      ],
+    return FutureBuilder(
+      future: fetchPost(widget.id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<Widget> postList = snapshot.data;
+          // return ListView(
+          //   children: <Widget>[
+          //     // _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
+          //     //     "Towradgi Beach", "2h", mood_happy),
+          //     // _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
+          //     //     'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_neutral),
+          //     // _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
+          //     //     "Towradgi Beach", "2", mood_sad),
+          //     // _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
+          //     //     'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_happy),
+          //   ],
+          // );
+          return ListView.builder(
+            itemCount: postList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return postList[index];
+            }
+          );
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
     );
   }
 
-  Widget _ForumCard(String username, String profile_img, String forum_img,
+  Widget _ForumCard(String content, String username, String profile_img, String forum_img,
       String location, String post_time, Icon mood_icon) {
-    const String str =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi congue felis ut elit dictum tincidunt. In nec orci. Phasellus at nisi vitae lorem feugiat interdum. Curabitur ultricies odio eu dolor efficitur, sit amet pretium sem elementum.";
+    // const String str =
+    //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi congue felis ut elit dictum tincidunt. In nec orci. Phasellus at nisi vitae lorem feugiat interdum. Curabitur ultricies odio eu dolor efficitur, sit amet pretium sem elementum.";
     return Column(children: [
       Card(
         color: Colors.white,
@@ -321,11 +407,11 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             Padding(
               padding: const EdgeInsets.fromLTRB(10.0, 0, 10, 10),
               child: new Text(
-                str,
+                content,
                 style: TextStyle(fontSize: 12, color: Colors.black),
               ),
             ),
-            Image.asset(forum_img),
+            Image.network(forum_img),
             Container(
               padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
               child: _forumBottomTable(),
@@ -378,7 +464,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
 
   Widget _userInfo(String username, String profile_pic_path, String location,
       String post_time, Icon mood_icon) {
-    String location_str = location + ' · ' + post_time + " ago";
+    //String location_str = location + ' · ' + post_time;
     return Container(
       padding: EdgeInsets.fromLTRB(10, 0, 1, 0),
       child: Row(
@@ -421,11 +507,22 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                         ),
                         Align(
                             alignment: Alignment.topLeft,
-                            child: Text(location_str,
+                            child: Text(location,
                                 style: TextStyle(
                                     color: Color(0xff999999),
                                     fontSize: 11,
                                     fontWeight: FontWeight.normal))),
+                        SizedBox(
+                          height: 1,
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(post_time,
+                                style: TextStyle(
+                                    color: Color(0xff999999),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.normal))),
+
                       ],
                     ))),
                     TableCell(
