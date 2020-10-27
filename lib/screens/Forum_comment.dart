@@ -10,8 +10,11 @@ class Forum_commentState extends State<Forum_comment>
 {
 
   TextEditingController commentController = TextEditingController();
+  Icon mood_happy =Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
+  Icon mood_neutral =Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
+  Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
 
-  Widget _ForumCard(String username, String profile_img, String forum_img,String location, String post_time, String comment) 
+  Widget _commentCard(String username, String profile_img, String forum_img,String location, String post_time, String comment) 
   {    
     return Card(
         color: Colors.white,
@@ -110,6 +113,157 @@ class Forum_commentState extends State<Forum_comment>
     );
   }
 
+  Widget _ForumCard(String username, String profile_img, String forum_img,
+      String location, String post_time, Icon mood_icon) {
+    const String str =
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi congue felis ut elit dictum tincidunt. In nec orci. Phasellus at nisi vitae lorem feugiat interdum. Curabitur ultricies odio eu dolor efficitur, sit amet pretium sem elementum.";
+    return Column(children: [
+      Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            _PostUserInfo(username, profile_img, location, post_time, mood_icon),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10.0, 0, 10, 10),
+              child: new Text(
+                str,
+                style: TextStyle(fontSize: 12, color: Colors.black),
+              ),
+            ),
+            Image.asset(forum_img),
+            Container(
+              padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
+              child: _forumBottomTable(),
+            ),
+            Row(
+              children: [
+                Column(
+                  children: [
+                    SizedBox(height: 5),
+                    Container(
+                        height: 40,
+                        width: 328,
+                        padding: const EdgeInsets.fromLTRB(10.0, 2, 0, 10),
+                        child: TextField(
+                          controller: commentController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            fillColor: Color(0xffF2F2F7),
+                            filled: true,
+                            hintText: 'Write your comment',
+                            hintStyle: TextStyle(fontSize: 12, height: 0.5),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20.0)),
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            labelStyle: TextStyle(fontSize: 12),
+                          ),
+                        )),
+                  ],
+                ),
+                MaterialButton(
+                  minWidth: 5,
+                  height: 10,
+                  textColor: const Color(0xff007AFF),
+                  padding: EdgeInsets.all(2.0),
+                  onPressed: () {},
+                  child: const Text('Post',
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: 10)
+    ]);
+  }
+
+ Widget _PostUserInfo(String username, String profile_pic_path, String location,
+      String post_time, Icon mood_icon) {
+    String location_str = location + ' · ' + post_time + " ago";
+    return Container(
+      padding: EdgeInsets.fromLTRB(10, 0, 1, 0),
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            profile_pic_path,
+            height: 40,
+            width: 40,
+          ),
+          SizedBox(
+            width: 5,
+          ),
+          Container(
+              height: 70,
+              child: Table(
+                defaultColumnWidth: FixedColumnWidth(156),
+                border: TableBorder.all(
+                    color: Colors.black26, width: 1, style: BorderStyle.none),
+                children: [
+                  TableRow(children: [
+                    TableCell(
+                        child: Align(
+                            child: Column(
+                      children: [
+                        SizedBox(
+                          height: 18,
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Row(children: [
+                              Text(username,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700)),
+                              SizedBox(width: 5),
+                              mood_icon,
+                            ])),
+                        SizedBox(
+                          height: 1,
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(location_str,
+                                style: TextStyle(
+                                    color: Color(0xff999999),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.normal))),
+                      ],
+                    ))),
+                    TableCell(
+                        child: Align(
+                            alignment: Alignment.topRight,
+                            child: Column(children: [
+                              SizedBox(
+                                height: 4,
+                              ),
+                              MaterialButton(
+                                minWidth: 70,
+                                height: 20,
+                                textColor: const Color(0xff007AFF),
+                                padding: EdgeInsets.all(2.0),
+                                onPressed: () {},
+                                child: const Text('Add Friend',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700)),
+                              ),
+                            ]))),
+                  ]),
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
   Widget _forumBottomTable() {
     IconButton commentButton = IconButton(
       iconSize:25.0, 
@@ -191,78 +345,61 @@ class Forum_commentState extends State<Forum_comment>
     double screen_width = MediaQuery.of(context).size.width;
     double textfield_icon_size = screen_width * 0.06;
     return new Scaffold(
-      appBar: PreferredSize
-      (
-        preferredSize: Size.fromHeight(appbar_h) ,
-        child: AppBar(
-        leading: new Row(children:[
-          SizedBox(width: 20,),
-          Column(children:
-          [
-             SizedBox(height: 20,),
-             Text('Comment', style: TextStyle(color: Colors.black,fontSize: 23,fontWeight: FontWeight.bold))
-          ])
-        ]),      
-        leadingWidth: 500,      
+      appBar:AppBar(
+          title: new Text('Comments',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700)),
+            leading: new Row(children: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                textColor: Color(0xFF1A7EFF),
+                child: Row(children: [
+                  Icon(
+                    Icons.arrow_back_ios,
+                    size: 17,
+                    color: Color(0xFFFF1300),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Back',
+                      style: TextStyle(
+                          color: Color(0xFFFC2D54),
+                          fontWeight: FontWeight.w700))
+                ]),
+              ),
+            ]),
+            leadingWidth: 89,
+          
         backgroundColor: Colors.white,
-      )),
+      ),
       body:Container(
         padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
         color: Colors.white,
         child:ListView(children: [
-             Row(children: [
-              Column(
-                  children: [
-                    SizedBox(height: 5,),
-                    Container(
-                        height: 50,
-                        width: 346,
-                        padding: const EdgeInsets.fromLTRB(5, 2, 0, 10),
-                        child: TextField(
-                          controller: commentController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Color(0xffF2F2F7),
-                            filled: true,
-                            hintText: 'Add a public comment...',
-                            hintStyle: TextStyle(fontSize: 12, height: 0.5),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20.0)),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            labelStyle: TextStyle(fontSize: 12),
-                          ),
-                        )),
-                  ],
-                ),
-                MaterialButton(
-                  minWidth: 5,
-                  height: 10,
-                  textColor: const Color(0xff007AFF),
-                  padding: EdgeInsets.all(2.0),
-                  onPressed: () {},
-                  child: const Text('Post', style:TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                ),
-              ],
-            ),
-        _ForumCard("Gloria Schultz", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "2",comment ),
+     
+        _ForumCard("Alex Suprun", 'assets/profile_pic2.png','assets/forum_pic2.png', "Towradgi Beach", "2h", mood_happy),
+        _commentCard("Gloria Schultz", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "2",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Sergiu Iacob", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
+        _commentCard("Sergiu Iacob", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Nathen Mcneil", 'assets/profile_pic3.png', 'assets/forum_pic.png',"Towradgi Beach", "1",comment ),
+        _commentCard("Nathen Mcneil", 'assets/profile_pic3.png', 'assets/forum_pic.png',"Towradgi Beach", "1",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Terrell Lam", 'assets/profile_pic4.png', 'assets/forum_pic.png',"Towradgi Beach", "4",comment ),
+        _commentCard("Terrell Lam", 'assets/profile_pic4.png', 'assets/forum_pic.png',"Towradgi Beach", "4",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Pranav Deleon", 'assets/profile_pic5.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
+        _commentCard("Pranav Deleon", 'assets/profile_pic5.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Guadalupe Avila", 'assets/profile_pic6.png', 'assets/forum_pic.png',"Towradgi Beach", "6",comment ),
+        _commentCard("Guadalupe Avila", 'assets/profile_pic6.png', 'assets/forum_pic.png',"Towradgi Beach", "6",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Annabella Petersen", 'assets/profile_pic7.png', 'assets/forum_pic.png',"Towradgi Beach", "5", comment),
+        _commentCard("Annabella Petersen", 'assets/profile_pic7.png', 'assets/forum_pic.png',"Towradgi Beach", "5", comment),
         SizedBox(height: 2,),
-        _ForumCard("Svarog Edortas", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "15",comment ),
+        _commentCard("Svarog Edortas", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "15",comment ),
         SizedBox(height: 2,),
-        _ForumCard("Elene Líadan", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "9",comment ),
+        _commentCard("Elene Líadan", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "9",comment ),
       ],)
    )
    );
