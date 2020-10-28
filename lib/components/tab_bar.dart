@@ -11,8 +11,9 @@ import 'package:http/http.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:wesurf/backend/post_data.dart';
-import 'package:wesurf/backend/media_store.dart';
 import 'package:wesurf/backend/user_data.dart';
+
+import 'package:wesurf/screens/Forum_comment.dart';
 
 import 'forecast_widget.dart';
 
@@ -30,14 +31,6 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   bool tapped = false;
   TextEditingController commentController = TextEditingController();
   String appid = "1e884f92b81b9b1eb0c42487fe6e1584";
-
-  // Icon mood_happy =
-  //     Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
-  //
-  // Icon mood_neutral =
-  //     Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
-  //
-  // Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
 
   double lat;
   double long;
@@ -74,9 +67,9 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   }
 
   Widget getMood(String mood) {
-    if (mood == 'mood_happy')
+    if (mood == 'happy')
       return Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
-    else if (mood == 'mood_neutral')
+    else if (mood == 'neutral')
       return Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
     return Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
   }
@@ -87,6 +80,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     var postInstance = FirebaseFirestore.instance.collection('posts');
     var userInstance = FirebaseFirestore.instance.collection('users');
 
+    String postUID;
     String locationName;
     String content;
     var image;
@@ -100,6 +94,8 @@ class _TabBarWidgetState extends State<TabBarWidget> {
       locationName = value.data()['name'];
       //for each post fetch data
       for (var post in value.data()['posts']) {
+          postUID = post;
+          //print("postUID: $postUID");
           await postInstance.doc(post).get().then((postValue) async{
             content = postValue.data()['content'];
             image = postValue.data()['image'];
@@ -109,13 +105,8 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             //for useUID fetch name
             await userInstance.doc(userUID).get().then((userValue) => userName = userValue.data()['name']);
           });
-          // print('location: $locationName');
-          // print('content: $content');
-          // print('image: ${image.toString()}');
-          // print('mood: $mood');
-          // print('timestamp: ${timestamp.toString()}');
-          // print('user: $userName');
           ForumCards.add(_ForumCard(
+              postUID,
               content,
               userName,
               'assets/profile_pic.png',
@@ -343,7 +334,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                         //============================================================
 
                         Container(
-                          child: _myListView(context),
+                          child: _postListView(),
                         ),
                       ],
                     ),
@@ -353,47 +344,41 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             ),
           );
         } else {
-          return CircularProgressIndicator();
+          return SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator());
         }
       },
     ));
   }
 
-  Widget _myListView(BuildContext context) {
-    return FutureBuilder(
-      future: fetchPost(widget.id),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List<Widget> postList = snapshot.data;
-          // return ListView(
-          //   children: <Widget>[
-          //     // _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
-          //     //     "Towradgi Beach", "2h", mood_happy),
-          //     // _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
-          //     //     'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_neutral),
-          //     // _ForumCard("Amanda", 'assets/profile_pic.png', 'assets/forum_pic.png',
-          //     //     "Towradgi Beach", "2", mood_sad),
-          //     // _ForumCard("Alex Suprun", 'assets/profile_pic2.png',
-          //     //     'assets/forum_pic2.png', "Towradgi Beach", "2h", mood_happy),
-          //   ],
-          // );
-          return ListView.builder(
-            itemCount: postList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return postList[index];
-            }
-          );
-        } else {
-          return CircularProgressIndicator();
-        }
-      },
+  Widget _postListView() {
+    return Container(
+      child: FutureBuilder(
+        future: fetchPost(widget.id),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Widget> postList = snapshot.data;
+            return ListView.builder(
+              itemCount: postList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return postList[index];
+              }
+            );
+          } else {
+            return SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 
-  Widget _ForumCard(String content, String username, String profile_img, String forum_img,
+  Widget _ForumCard(String postUID, String content, String username, String profile_img, String forum_img,
       String location, String post_time, Icon mood_icon) {
-    // const String str =
-    //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi congue felis ut elit dictum tincidunt. In nec orci. Phasellus at nisi vitae lorem feugiat interdum. Curabitur ultricies odio eu dolor efficitur, sit amet pretium sem elementum.";
     return Column(children: [
       Card(
         color: Colors.white,
@@ -414,7 +399,16 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             Image.network(forum_img),
             Container(
               padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
-              child: _forumBottomTable(),
+              child: _forumBottomTable(
+                  postUID,
+                  content,
+                  username,
+                  profile_img,
+                  forum_img,
+                  location,
+                  post_time,
+                  mood_icon
+              ),
             ),
             Row(
               children: [
@@ -464,7 +458,6 @@ class _TabBarWidgetState extends State<TabBarWidget> {
 
   Widget _userInfo(String username, String profile_pic_path, String location,
       String post_time, Icon mood_icon) {
-    //String location_str = location + ' · ' + post_time;
     return Container(
       padding: EdgeInsets.fromLTRB(10, 0, 1, 0),
       child: Row(
@@ -552,7 +545,8 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     );
   }
 
-  Widget _forumBottomTable() {
+  Widget _forumBottomTable(String postUID, String content, String username, String profile_img, String forum_img,
+      String location, String post_time, Icon mood_icon) {
     return Table(
         //defaultColumnWidth:FixedColumnWidth(100),
         border: TableBorder.all(
@@ -568,7 +562,22 @@ class _TabBarWidgetState extends State<TabBarWidget> {
               SizedBox(width: 10),
               Align(
                 alignment: Alignment.topLeft,
-                child: Icon(TablerIcons.message_circle, size: 25),
+                child: GestureDetector(
+                    onTap: () {
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) => Forum_comment()));
+                      Navigator.of(context).push(_detailComment(
+                          postUID,
+                          content,
+                          username,
+                          profile_img,
+                          forum_img,
+                          location,
+                          post_time,
+                          mood_icon
+
+                      ));
+                    },
+                    child: Icon(TablerIcons.message_circle, size: 25)),
               ),
               SizedBox(width: 10),
               Align(
@@ -614,6 +623,33 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             ])),
           ]),
         ]);
+  }
+
+  Route _detailComment(String postUID,String content, String username, String profile_img, String forum_img,
+      String location, String post_time, Icon mood_icon) {
+    return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation)
+          => Forum_comment(
+            postUID,
+            content,
+            username,
+            profile_img,
+            forum_img,
+            location,
+            post_time,
+            mood_icon
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin= Offset(0.0, 1.0);
+          var end = Offset.zero;
+          var curve = Curves.easeIn;
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          return SlideTransition(
+              position: animation.drive(tween),
+              child: child
+          );
+      }
+    );
   }
 }
 

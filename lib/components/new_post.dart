@@ -129,7 +129,7 @@ class CreateNewPostState extends State<CreateNewPost> {
             actions: <Widget>[
               FlatButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  _postBtn();
                 },
                 textColor: Color(0xFF1A7EFF),
                 child: Row(children: [
@@ -351,6 +351,7 @@ class CreateNewPostState extends State<CreateNewPost> {
             print("selected_wave_mood: " + selected_wave_mood);
             print("selected_wind_mood: " + selected_wind_mood);
             print("selected_crowd_mood: " + selected_crowd_mood);
+            mood = selected_how_mood;
         });
       }      
       );

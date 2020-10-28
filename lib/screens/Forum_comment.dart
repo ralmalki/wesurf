@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import 'package:http/http.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:wesurf/backend/comment_data.dart';
+import 'package:wesurf/backend/post_data.dart';
+
 class Forum_comment extends StatefulWidget {
+  Forum_comment(
+      this.postUID,
+      this.content,
+      this.username,
+      this.profile_img,
+      this.forum_img,
+      this.location,
+      this.post_time,
+      this.mood_icon);
+
+  final postUID;
+  final content;
+  final username;
+  final profile_img;
+  final forum_img;
+  final location;
+  final post_time;
+  final mood_icon;
+
   @override
   Forum_commentState createState() => new Forum_commentState();
 }
@@ -10,11 +37,68 @@ class Forum_commentState extends State<Forum_comment>
 {
 
   TextEditingController commentController = TextEditingController();
-  Icon mood_happy =Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
-  Icon mood_neutral =Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
-  Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
+  // Icon mood_happy =Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
+  // Icon mood_neutral =Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
+  // Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
 
-  Widget _commentCard(String username, String profile_img, String forum_img,String location, String post_time, String comment) 
+  String timeFromNow(String t) {
+    DateTime timestamp = DateTime.parse(t);
+    Duration duration = DateTime.now().difference(timestamp);
+    if (duration.inSeconds > 60) {
+      if (duration.inMinutes > 60) {
+        if (duration.inHours > 24) {
+          return '${duration.inDays} days ago';
+        }
+        else
+          return '${duration.inHours} hours ago';
+      }
+      else
+        return '${duration.inMinutes} minutes ago';
+    }
+    return 'Just now';
+  }
+
+  Future<List<Widget>> fetchComment(String postUID) async {
+    print("postUID: $postUID");
+    Firebase.initializeApp();
+    var postInstance = FirebaseFirestore.instance.collection('posts');
+    var userInstance = FirebaseFirestore.instance.collection('users');
+    var commentInstance = FirebaseFirestore.instance.collection('comments');
+
+    String content;
+    var timestamp;
+    String userName;
+
+    List<Widget> CommentList = new List<Widget>();
+    //fetch all post
+    await postInstance.doc(postUID).get().then((value) async {
+      print("post: ${value.data()}");
+      //for each post fetch data
+      for (var comment in value.data()['comments']) {
+        print("comment: $comment");
+        await commentInstance.doc(comment).get().then((commentValue) async{
+          content = commentValue.data()['content'];
+          timestamp = commentValue.data()['timestamp'];
+          String userUID = commentValue.data()['userUID'];
+          //for useUID fetch name
+          await userInstance.doc(userUID).get().then((userValue) => userName = userValue.data()['name']);
+        });
+        print("userName: $userName");
+        print("timestamp: $timestamp");
+        print("comment: $comment");
+        CommentList.add(_commentCard(
+            userName,
+            "assets/profile_pic5.png",
+            widget.location,
+            timeFromNow(timestamp),
+            content));
+      }
+    });
+    //get item from newest to oldest
+    return CommentList.reversed.toList();
+  }
+
+  Widget _commentCard(String username, String profile_img, String location, String post_time, String comment)
   {    
     return Card(
         color: Colors.white,
@@ -33,7 +117,6 @@ class Forum_commentState extends State<Forum_comment>
 
   Widget _userInfo(String username, String profile_pic_path, String location,String post_time, String comment) 
   {
-    String location_str = " "+post_time + " days ago";
     return Container(
       height: 85,
       child:Container(
@@ -58,12 +141,12 @@ class Forum_commentState extends State<Forum_comment>
                     child:Row(children: [
                       Text(username, style: TextStyle(fontSize: 14,fontWeight: FontWeight.w700)),
                       SizedBox(width:3),
-                      Text(location_str,style: TextStyle(color: Colors.grey[700], fontSize: 12,fontWeight: FontWeight.normal)),
+                      Text(post_time,style: TextStyle(color: Colors.grey[700], fontSize: 12,fontWeight: FontWeight.normal)),
                     ],),),
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
                     width: 329,
-                    child:Text("piscing el consectetur adipiscing elit. Morbi congue felis ut elit dictum tincidunt.",style: TextStyle(color: Colors.grey[700], fontSize: 12,fontWeight: FontWeight.normal)),
+                    child:Text(comment,style: TextStyle(color: Colors.grey[700], fontSize: 12,fontWeight: FontWeight.normal)),
                   ),
  
               Container(
@@ -105,7 +188,7 @@ class Forum_commentState extends State<Forum_comment>
                               )
                           ]))),
                         ]),
-                            ]))
+                      ]))
                 ]
               ),
               ]),
@@ -126,7 +209,7 @@ class Forum_commentState extends State<Forum_comment>
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            _PostUserInfo(username, profile_img, location, post_time, mood_icon),
+            _PostUserInfo(),
             Padding(
               padding: const EdgeInsets.fromLTRB(10.0, 0, 10, 10),
               child: new Text(
@@ -134,11 +217,11 @@ class Forum_commentState extends State<Forum_comment>
                 style: TextStyle(fontSize: 12, color: Colors.black),
               ),
             ),
-            Image.asset(forum_img),
-            Container(
-              padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
-              child: _forumBottomTable(),
-            ),
+            Image.network(widget.forum_img),
+            // Container(
+            //   padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
+            //   child: _forumBottomTable(),
+            // ),
             Row(
               children: [
                 Column(
@@ -147,7 +230,7 @@ class Forum_commentState extends State<Forum_comment>
                     Container(
                         height: 40,
                         width: 328,
-                        padding: const EdgeInsets.fromLTRB(10.0, 2, 0, 10),
+                        padding: const EdgeInsets.fromLTRB(10.0, 6, 0, 10),
                         child: TextField(
                           controller: commentController,
                           decoration: InputDecoration(
@@ -171,7 +254,11 @@ class Forum_commentState extends State<Forum_comment>
                   height: 10,
                   textColor: const Color(0xff007AFF),
                   padding: EdgeInsets.all(2.0),
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      _postBtn();
+                    });
+                  },
                   child: const Text('Post',
                       style:
                           TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
@@ -185,15 +272,15 @@ class Forum_commentState extends State<Forum_comment>
     ]);
   }
 
- Widget _PostUserInfo(String username, String profile_pic_path, String location,
-      String post_time, Icon mood_icon) {
-    String location_str = location + ' · ' + post_time + " ago";
+  //Post owner card
+  Widget _PostUserInfo() {
+    // String location_str = location + ' · ' + post_time + " ago";
     return Container(
       padding: EdgeInsets.fromLTRB(10, 0, 1, 0),
       child: Row(
         children: <Widget>[
           Image.asset(
-            profile_pic_path,
+            widget.profile_img,
             height: 40,
             width: 40,
           ),
@@ -218,19 +305,29 @@ class Forum_commentState extends State<Forum_comment>
                         Align(
                             alignment: Alignment.topLeft,
                             child: Row(children: [
-                              Text(username,
+                              Text(widget.username,
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700)),
                               SizedBox(width: 5),
-                              mood_icon,
+                              widget.mood_icon,
                             ])),
                         SizedBox(
                           height: 1,
                         ),
                         Align(
                             alignment: Alignment.topLeft,
-                            child: Text(location_str,
+                            child: Text(widget.location,
+                                style: TextStyle(
+                                    color: Color(0xff999999),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.normal))),
+                        SizedBox(
+                          height: 1,
+                        ),
+                        Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(widget.post_time,
                                 style: TextStyle(
                                     color: Color(0xff999999),
                                     fontSize: 11,
@@ -264,76 +361,88 @@ class Forum_commentState extends State<Forum_comment>
     );
   }
 
-  Widget _forumBottomTable() {
-    IconButton commentButton = IconButton(
-      iconSize:25.0, 
-      icon: Icon(TablerIcons.message_circle),
-      onPressed: (){
-        setState(() {
-        Navigator.push(context,MaterialPageRoute(builder: (context) => Forum_comment()));
-      });
-      });
-    return Table(
-        //defaultColumnWidth:FixedColumnWidth(100),
-        border: TableBorder.all(
-            color: Colors.black26, width: 1, style: BorderStyle.none),
-        children: [
-          TableRow(children: [
-            TableCell(
-                child: Row(children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Icon(TablerIcons.droplet, size: 25),
-              ),
-              //SizedBox(width: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: commentButton,
-              ),
-             // SizedBox(width: 10),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Icon(TablerIcons.share, size: 25),
-              ),
-              SizedBox(width: 95),
-              Text("126",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              SizedBox(width: 1),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Text("drops",
-                    style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.normal)),
-              ),
-              SizedBox(width: 10),
-              Text("83",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              SizedBox(width: 1),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Text("replies",
-                    style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.normal)),
-              ),
-              SizedBox(width: 10),
-              Text("200",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              SizedBox(width: 1),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Text("views",
-                    style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.normal)),
-              ),
-            ])),
-          ]),
-        ]);
+  // Widget _forumBottomTable() {
+  //   IconButton commentButton = IconButton(
+  //     iconSize:25.0,
+  //     icon: Icon(TablerIcons.message_circle),
+  //     onPressed: (){
+  //       setState(() {
+  //       Navigator.push(context,MaterialPageRoute(builder: (context) => Forum_comment()));
+  //     });
+  //     });
+  //   return Table(
+  //       //defaultColumnWidth:FixedColumnWidth(100),
+  //       border: TableBorder.all(
+  //           color: Colors.black26, width: 1, style: BorderStyle.none),
+  //       children: [
+  //         TableRow(children: [
+  //           TableCell(
+  //               child: Row(children: [
+  //             Align(
+  //               alignment: Alignment.topLeft,
+  //               child: Icon(TablerIcons.droplet, size: 25),
+  //             ),
+  //             //SizedBox(width: 10),
+  //             Align(
+  //               alignment: Alignment.topLeft,
+  //               child: commentButton,
+  //             ),
+  //            // SizedBox(width: 10),
+  //             Align(
+  //               alignment: Alignment.topLeft,
+  //               child: Icon(TablerIcons.share, size: 25),
+  //             ),
+  //             SizedBox(width: 95),
+  //             Text("126",
+  //                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+  //             SizedBox(width: 1),
+  //             Align(
+  //               alignment: Alignment.bottomCenter,
+  //               child: Text("drops",
+  //                   style: TextStyle(
+  //                       fontSize: 9,
+  //                       color: Colors.grey,
+  //                       fontWeight: FontWeight.normal)),
+  //             ),
+  //             SizedBox(width: 10),
+  //             Text("83",
+  //                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+  //             SizedBox(width: 1),
+  //             Align(
+  //               alignment: Alignment.bottomCenter,
+  //               child: Text("replies",
+  //                   style: TextStyle(
+  //                       fontSize: 9,
+  //                       color: Colors.grey,
+  //                       fontWeight: FontWeight.normal)),
+  //             ),
+  //             SizedBox(width: 10),
+  //             Text("200",
+  //                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+  //             SizedBox(width: 1),
+  //             Align(
+  //               alignment: Alignment.bottomCenter,
+  //               child: Text("views",
+  //                   style: TextStyle(
+  //                       fontSize: 9,
+  //                       color: Colors.grey,
+  //                       fontWeight: FontWeight.normal)),
+  //             ),
+  //           ])),
+  //         ]),
+  //       ]);
+  // }
+
+  void _postBtn() async {
+    await Firebase.initializeApp();
+    String userUID = FirebaseAuth.instance.currentUser.uid;
+    CommentData commentData = new CommentData();
+    PostData postData = new PostData(postUID: widget.postUID);
+    String commentUID = await commentData.createComment(userUID, widget.postUID, commentController.text);
+    postData.addComment(commentUID);
+    print("post button pressed");
+    commentController.clear();
+    //Navigator.pop(context, true);
   }
 
   @override
@@ -377,32 +486,65 @@ class Forum_commentState extends State<Forum_comment>
           
         backgroundColor: Colors.white,
       ),
-      body:Container(
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-        color: Colors.white,
-        child:ListView(children: [
-     
-        _ForumCard("Alex Suprun", 'assets/profile_pic2.png','assets/forum_pic2.png', "Towradgi Beach", "2h", mood_happy),
-        _commentCard("Gloria Schultz", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "2",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Sergiu Iacob", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Nathen Mcneil", 'assets/profile_pic3.png', 'assets/forum_pic.png',"Towradgi Beach", "1",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Terrell Lam", 'assets/profile_pic4.png', 'assets/forum_pic.png',"Towradgi Beach", "4",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Pranav Deleon", 'assets/profile_pic5.png', 'assets/forum_pic.png',"Towradgi Beach", "5",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Guadalupe Avila", 'assets/profile_pic6.png', 'assets/forum_pic.png',"Towradgi Beach", "6",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Annabella Petersen", 'assets/profile_pic7.png', 'assets/forum_pic.png',"Towradgi Beach", "5", comment),
-        SizedBox(height: 2,),
-        _commentCard("Svarog Edortas", 'assets/profile_pic.png', 'assets/forum_pic.png',"Towradgi Beach", "15",comment ),
-        SizedBox(height: 2,),
-        _commentCard("Elene Líadan", 'assets/profile_pic2.png', 'assets/forum_pic.png',"Towradgi Beach", "9",comment ),
-      ],)
-   )
+      body:FutureBuilder(
+        future: fetchComment(widget.postUID),
+        builder: (context, snapshot) {
+          print(snapshot.data.toString());
+          if (snapshot.hasData) {
+            List<Widget> commentList = snapshot.data;
+            return Column(
+              children: [
+                _ForumCard(
+                    widget.username,
+                    'assets/profile_pic2.png',
+                    widget.forum_img,
+                    widget.location,
+                    widget.post_time,
+                    widget.mood_icon
+                ),
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: commentList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return commentList[index];
+                      }
+                  ),
+                ),
+              ],
+            );
+          }
+          else return SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator());
+        }
+
+      )
    );
+  }
+
+  Widget _commentListView() {
+    return Container(
+      child: FutureBuilder(
+        future: fetchComment(widget.postUID),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<Widget> commentList = snapshot.data;
+            return ListView.builder(
+                itemCount: commentList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return commentList[index];
+                }
+            );
+          } else {
+            return SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
   }
 
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart';
 
 class PostData {
   PostData({this.postUID});
@@ -10,6 +11,9 @@ class PostData {
   Future<String> createPost(String userUID, String locationUID, String content, String imageURL, String mood) async {
     //record the current time as post uid to link with location
     //also can be used to record time later on
+
+    List<String> comments = [];
+
     String timestamp = DateTime.now().toString();
     String postUID = userUID + timestamp;
     await postCollection.doc(postUID).set({
@@ -18,13 +22,19 @@ class PostData {
       'content' : content,
       'image' : imageURL,
       'mood' : mood,
-      'timestamp' : timestamp
+      'timestamp' : timestamp,
+      'comments' : comments
     });
     return postUID;
   }
 
-  Future getPostOwner() async {
-    // return await postCollection.doc()
+  Future addComment(String commentUID) async {
+    //print(commentUID);
+    return await postCollection
+        .doc(postUID)
+        .update({
+      'comments': FieldValue.arrayUnion([commentUID])
+    });
   }
 
 }
