@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wesurf/backend/user_data.dart';
 import 'package:wesurf/components/tab_bar.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:http/http.dart';
@@ -11,13 +13,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 
-class WeatherInformation extends StatelessWidget {
+class WeatherInformation extends StatefulWidget {
   WeatherInformation(this.id, this.lat, this.long);
 
   final String id;
   final lat;
   final long;
+
+  @override
+  _WeatherInformationState createState() => _WeatherInformationState();
+}
+
+class _WeatherInformationState extends State<WeatherInformation> {
   dynamic locationData;
+  bool isPlaceInFav = false;
+  User user = FirebaseAuth.instance.currentUser;
 
   _openMapForDirection(double lan, double lat) async {
     final availableMaps = await MapLauncher.installedMaps;
@@ -30,15 +40,16 @@ class WeatherInformation extends StatelessWidget {
   @override
   void initState() {
     locationData = getLocation();
+    checkIfLocationInFav();
     // Firebase.initializeApp();
     // User currentUser = FirebaseAuth.instance.currentUser;
     // print(currentUser.toString);
   }
 
   Future<dynamic> getLocation() async {
-    Firebase.initializeApp();
+    //Firebase.initializeApp();
     final _firebase = FirebaseFirestore.instance;
-    dynamic data = _firebase.collection('locations').doc(id).get();
+    dynamic data = _firebase.collection('locations').doc(widget.id).get();
     return data;
   }
 
@@ -51,9 +62,25 @@ class WeatherInformation extends StatelessWidget {
     return new Row(children: list);
   }
 
+  void addLocationToFav() async {
+    await UserData(uid: user.uid).addFavLocationToUser(widget.id).then((value) {
+      setState(() {
+        isPlaceInFav = value;
+      });
+    });
+  }
+
+  void checkIfLocationInFav() async {
+    await UserData(uid: user.uid).checkLocationInFav(widget.id).then((value) {
+      setState(() {
+        isPlaceInFav = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    print("weather info lat: $lat, long: $long");
+    print("weather info lat: ${widget.lat}, long: ${widget.long}");
     return DraggableScrollableSheet(
       initialChildSize: 0.25,
       minChildSize: 0.2,
@@ -86,7 +113,6 @@ class WeatherInformation extends StatelessWidget {
                           List<String> signs = new List<String>();
                           if (snapshot.hasData) {
                             data = snapshot.data.data();
-
                             if (data['shark'] >= 2) {
                               safe = false;
                               signs.add('sharks');
@@ -127,7 +153,19 @@ class WeatherInformation extends StatelessWidget {
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Icon(TablerIcons.heart),
+                                    //Icon(TablerIcons.heart),
+                                    IconButton(
+                                      icon: isPlaceInFav
+                                          ? ImageIcon(
+                                              AssetImage(
+                                                  'assets/fill-heart.png'),
+                                              color: Colors.red,
+                                            )
+                                          : Icon(TablerIcons.heart),
+                                      onPressed: () {
+                                        addLocationToFav();
+                                      },
+                                    )
                                   ],
                                 ),
                                 Row(
@@ -144,34 +182,7 @@ class WeatherInformation extends StatelessWidget {
                                 ),
                                 Padding(
                                     padding: const EdgeInsets.only(top: 10.0),
-                                    child: getSigns(signs)
-                                    // Row(
-                                    //   children: <Widget> [
-                                    //     for (var sign in signs) {
-                                    //       Image.asset('assets/$sign.png'),
-                                    //     };
-                                    //
-                                    //     Image.asset(
-                                    //       'assets/sharks.png',
-                                    //       height: 40,
-                                    //     ),
-                                    //     SizedBox(
-                                    //       width: 10.0,
-                                    //     ),
-                                    //     Image.asset(
-                                    //       'assets/waves.png',
-                                    //       height: 40,
-                                    //     ),
-                                    //     SizedBox(
-                                    //       width: 10.0,
-                                    //     ),
-                                    //     Image.asset(
-                                    //       'assets/current.png',
-                                    //       height: 40,
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    ),
+                                    child: getSigns(signs)),
                                 Padding(
                                   padding:
                                       const EdgeInsets.only(top: 15, right: 10),
@@ -181,7 +192,7 @@ class WeatherInformation extends StatelessWidget {
                                     children: [
                                       _Btn(
                                           context,
-                                          id,
+                                          widget.id,
                                           115,
                                           TablerIcons.alert_triangle,
                                           'Report',
@@ -189,7 +200,7 @@ class WeatherInformation extends StatelessWidget {
                                           Colors.black),
                                       _Btn(
                                           context,
-                                          id,
+                                          widget.id,
                                           125,
                                           TablerIcons.plus,
                                           'New Post',
@@ -217,7 +228,9 @@ class WeatherInformation extends StatelessWidget {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Center(child: TabBarWidget(lat, long)),
+                                  child: Center(
+                                      child: TabBarWidget(
+                                          widget.lat, widget.long)),
                                 )
                               ],
                             ),

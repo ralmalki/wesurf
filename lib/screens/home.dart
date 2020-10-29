@@ -38,12 +38,17 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> checkIfUserLoggedIn() async {
-    await Firebase.initializeApp();
-    if (FirebaseAuth.instance.currentUser != null) {
-      _selectedIndex = 2;
-    } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Login()));
+    //await Firebase.initializeApp();
+    try {
+      //await Firebase.initializeApp();
+      if (FirebaseAuth.instance.currentUser != null) {
+        _selectedIndex = 2;
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Login()));
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -62,7 +67,6 @@ class _HomeState extends State<Home> {
         onPageChanged: _onPageChanged,
         physics: NeverScrollableScrollPhysics(),
       ),
-      backgroundColor: Colors.deepOrange,
       bottomNavigationBar: BottomNavigationBar(
         elevation: 50,
         type: BottomNavigationBarType.fixed,

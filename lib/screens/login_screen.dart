@@ -240,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
           },*/
             onPressed: () async {
-              await Firebase.initializeApp();
+              //await Firebase.initializeApp();
               try {
                 UserCredential userCredential = await FirebaseAuth.instance
                     .signInWithEmailAndPassword(

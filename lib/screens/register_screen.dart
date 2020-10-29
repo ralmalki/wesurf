@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wesurf/backend/user_data.dart';
+import 'package:wesurf/components/onboarding.dart';
 
 import 'home.dart';
 import 'login_screen.dart';
@@ -161,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _logInBtn(String btnStr) {
-    Firebase.initializeApp();
+    //Firebase.initializeApp();
     double padding_top = MediaQuery.of(context).size.width * 0.0056;
     return Container(
         height: MediaQuery.of(context).size.height * 0.055,
@@ -190,12 +191,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       email: emailController.text,
                       password: passwordController.text);
               User user = userCredential.user;
+
               // UserData newUser = UserData(uid: user.uid)
               //     .updateOrAddUserName(nameController.text);
               await UserData(uid: user.uid)
                   .updateOrAddUserName(nameController.text);
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Home()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => OnBoarding()));
             } on FirebaseAuthException catch (e) {
               if (e.code == 'weak-password') {
                 print('The password is weak');

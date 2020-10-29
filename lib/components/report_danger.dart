@@ -77,7 +77,7 @@ class ReportDangerState extends State<ReportDanger> {
                             onPressed: () {
                               pop.dismiss(context);
 
-                              Firebase.initializeApp();
+                              //Firebase.initializeApp();
                               final _firestore = FirebaseFirestore.instance;
 
                               if (sharkHasBeenPressed.value == true) {

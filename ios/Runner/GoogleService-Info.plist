@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>233132364822-re090e1qepgplosnq5q2pvce24lkmuit.apps.googleusercontent.com</string>
+	<string>591358838101-m1eu64b2fj9gs9tg01orn3p9rr5nrk21.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.233132364822-re090e1qepgplosnq5q2pvce24lkmuit</string>
+	<string>com.googleusercontent.apps.591358838101-m1eu64b2fj9gs9tg01orn3p9rr5nrk21</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDE54aaVSe0bBEnWKVr9GC1lCwTdlTbXB0</string>
+	<string>AIzaSyCOI7LNDtY-6vEScEBnNMgWICE_qgMLV2o</string>
 	<key>GCM_SENDER_ID</key>
-	<string>233132364822</string>
+	<string>591358838101</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.uow.wesurf</string>
+	<string>edu.uow.wesurf</string>
 	<key>PROJECT_ID</key>
-	<string>wesurf-94b61</string>
+	<string>uowwesurf</string>
 	<key>STORAGE_BUCKET</key>
-	<string>wesurf-94b61.appspot.com</string>
+	<string>uowwesurf.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:233132364822:ios:4adfc88348bfdc2b7c5137</string>
+	<string>1:591358838101:ios:2a340e6abb5cf20d379bdc</string>
 	<key>DATABASE_URL</key>
-	<string>https://wesurf-94b61.firebaseio.com</string>
+	<string>https://uowwesurf.firebaseio.com</string>
 </dict>
 </plist>

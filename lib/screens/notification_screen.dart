@@ -39,7 +39,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<dynamic> getNotification() async {
-    Firebase.initializeApp();
+    //Firebase.initializeApp();
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
     dynamic data = await _firestore.collection('locations').get();
     for (var spot in data) {
@@ -55,12 +55,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
           child: AppBar(
+              title: Text(
+                "Notifications",
+                style: TextStyle(
+                    fontSize: 25.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
               backgroundColor: Colors.white,
-              title: Text('Notifications',
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22)),
               actions: <Widget>[
                 Padding(
                     padding: EdgeInsets.all(5),
@@ -68,23 +70,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0)),
                         fillColor: Color.fromRGBO(255, 59, 48, 1),
-                        child: Row(children: <Widget>[
-                          Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(TablerIcons.heart,
-                                  color:
-                                      Colors.white)), //changed to filled heart
-                          Text('Loved\nSpots',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w400))
-                        ]),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                                padding: EdgeInsets.all(2),
+                                child: Icon(TablerIcons.heart,
+                                    color: Colors
+                                        .white)), //changed to filled heart
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(
+                                'Spots',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            )
+                          ],
+                        ),
                         //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LocationWidget()));
+                                  builder: (context) => LovedSpots()));
                         }))
               ])),
       body: SingleChildScrollView(

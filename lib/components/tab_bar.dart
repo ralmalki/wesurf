@@ -6,6 +6,7 @@ import 'package:flutter_lorem/flutter_lorem.dart';
 //import '../backend/network.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
+import 'package:wesurf/components/daily_forecast.dart';
 
 import 'forecast_widget.dart';
 
@@ -47,6 +48,25 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     }
   }
 
+  Image getWeatherIcon(int weatherCode) {
+    String weatherCondition = "";
+    if (weatherCode >= 200 && weatherCode <= 299)
+      weatherCondition = "storm";
+    else if (weatherCode >= 300 && weatherCode <= 399)
+      weatherCondition = "drizzle";
+    else if (weatherCode >= 500 && weatherCode <= 599)
+      weatherCondition = "rain";
+    else
+      weatherCondition = "cloudy";
+
+    return Image.asset(
+      'assets/weather-$weatherCondition.png',
+      height: 100,
+      width: 100,
+      fit: BoxFit.fitWidth,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +94,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
           int humidity = data['current']['humidity'].toInt();
           String sky = data['current']['weather'][0]['main'];
           String skyDisc = data['current']['weather'][0]['description'];
-          String skyIcon = data['current']['weather'][0]['icon'];
+          int weatherId = data['current']['weather'][0]['id'];
           int windSpeed = (data['current']['wind_speed'] * 3.6).round();
           int windDirection = data['current']['wind_deg'].toInt();
           int uv = data['current']['uvi'].toInt();
@@ -134,10 +154,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
-                                      TablerIcons.cloud_rain,
-                                      size: 100.0,
-                                    ),
+                                    getWeatherIcon(weatherId),
                                     Text(
                                       "$currentTemp℃",
                                       style: TextStyle(fontSize: 90.0),
@@ -218,7 +235,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                                 if (tapped == false) {
                                   return GestureDetector(
                                     child: Container(
-                                      child: ExpandedWeatherWidget(
+                                      child: WeatherWidget(
                                           time: time, // time of widget info
                                           temp: temp, // int temp
                                           weatherCode:
