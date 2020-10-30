@@ -7,6 +7,7 @@ import 'package:flutter_lorem/flutter_lorem.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:wesurf/components/daily_forecast.dart';
+import 'package:wesurf/components/hourly_weather.dart';
 
 import 'forecast_widget.dart';
 
