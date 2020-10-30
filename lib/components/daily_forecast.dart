@@ -220,13 +220,6 @@ class WeatherInfo {
     return dateString.toUpperCase().substring(0, 3);
   }
 
-  //------DELETE IF WIND SPEED IS ALREADY CONVERTED------
-  //Wind speed from m/s to km/h
-  // double convertWindSpeed(int windspeed) {
-  //   return windspeed * 3.6;
-  // }
-  //------------------------------------------------------
-
   //Convert chance of rain
   int convertChanceOfRain(double pop) {
     int chanceOfRain = (pop * 100).toInt();
@@ -236,13 +229,13 @@ class WeatherInfo {
 
   //Get icon according to chance of rain
   int getRainChance(double rainChance) {
-    if (rainChance >= 0 && rainChance < 25)
+    if (rainChance >= 0 && rainChance < 0.25)
       return 0;
-    else if (rainChance >= 25 && rainChance < 50)
+    else if (rainChance >= 0.25 && rainChance < 0.50)
       return 25;
-    else if (rainChance >= 50 && rainChance < 75)
+    else if (rainChance >= 0.50 && rainChance < 0.75)
       return 50;
-    else if (rainChance >= 75 && rainChance < 100) return 75;
+    else if (rainChance >= 0.75 && rainChance < 1.00) return 75;
     return 100;
   }
 
@@ -255,11 +248,6 @@ class WeatherInfo {
     else if (weatherCode >= 500 && weatherCode <= 599) return "Rain";
     return "Cloudy";
   }
-
-  //DELETE AS HUMIDITY SHARE THE UNIVERSAL ICON NOW
-  // int getHumidityLevel(int humidity) {
-  //   return (humidity / 100).toInt() + 1;
-  // }
 
   //Get icon according to direction
   String getWindDirection(int degree) {

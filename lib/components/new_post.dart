@@ -3,32 +3,71 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:wesurf/backend/post_data.dart';
+import 'package:wesurf/backend/location_data.dart';
 
 class CreateNewPost extends StatefulWidget {
+  CreateNewPost(this.locationUID);
+  final String locationUID;
   // @override
   CreateNewPostState createState() => CreateNewPostState();
-
-  String upload_pic_path;
-  String post_contents;
-  String surf_condition;
-  String wave_height;
-  String wind_speed;
-  String crowd_level;
 }
 
 class CreateNewPostState extends State<CreateNewPost> {
   dynamic _image1, _image2, _image3, _image4, _image5, _image6;
   var image1, image2, image3, image4, image5, image6;
 
+  File testImage;
+  String mood;
+
   TextEditingController contentsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   String upload_pic_path;
   String post_contents;
-  String surf_condition;
-  String wave_height;
-  String wind_speed;
-  String crowd_level;
+     String selected_how_mood = "empty";
+  String selected_surf_mood = "empty";
+  String selected_wave_mood = "empty";
+  String selected_wind_mood = "empty";
+  String selected_crowd_mood = "empty";
+
+ 
+  bool how_happy_stat = false;
+  bool how_sad_stat = false;
+  bool how_neutral_stat = false;
+  bool surf_happy_stat = false; 
+  bool surf_sad_stat = false;
+   bool surf_neutral_stat = false;
+  bool wave_happy_stat = false;
+  bool wave_sad_stat = false;
+  bool wave_neutral_stat = false; 
+  bool wind_sad_stat = false;
+   bool wind_happy_stat = false;
+  bool wind_neutral_stat = false;
+  bool crowd_happy_stat = false;
+  bool crowd_sad_stat = false; 
+  bool crowd_neutral_stat = false;
+
+  String how_happy = "how_happy"; 
+  String how_sad = "how_sad";
+  String how_neutral = "how_neutral";
+  String surf_happy="surf_happy";
+  String surf_sad = "surf_sad";
+  String surf_neutral= "surf_neutral";
+  String wave_happy="wave_happy";
+  String wave_sad="wave_sad";
+  String wave_neutral="wave_neutral";
+  String wind_happy="wind_happy";
+  String wind_sad="wind_sad";
+  String wind_neutral="wind_neutral";
+  String crowd_happy = "crowd_happy";
+  String crowd_sad="crowd_sad";
+  String crowd_neutral="crowd_neutral";
 
   final ValueNotifier<bool> how_happyClick = ValueNotifier(false);
   final ValueNotifier<bool> how_sadClick = ValueNotifier(false);
@@ -84,13 +123,13 @@ class CreateNewPostState extends State<CreateNewPost> {
                 ]),
               ),
             ]),
-            //leadingWidth: 90,
+            leadingWidth: 89,
             backgroundColor: Colors.white,
             centerTitle: true,
             actions: <Widget>[
               FlatButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  _postBtn();
                 },
                 textColor: Color(0xFF1A7EFF),
                 child: Row(children: [
@@ -189,48 +228,133 @@ class CreateNewPostState extends State<CreateNewPost> {
         ));
   }
 
-  Widget _conditionIcon(
-      IconData icon, Color color, final ValueNotifier<bool> moodPressed) {
-    return ValueListenableBuilder(
-        valueListenable: moodPressed,
-        builder: (context, bool pressed, child) {
-          return GestureDetector(
-            onTap: () {
-              moodPressed.value = !moodPressed.value;
-            },
-            child: Container(
-              child: new Icon(
-                icon,
-                size: 23,
-                color: moodPressed.value ? color : Colors.black,
-              ),
-            ),
-          );
-        });
-  }
+  Widget _conditionIcon(IconData icon, Color color, final ValueNotifier<bool> moodPressed, bool btnStat, String btnType) 
+  {
+    bool Clickable  = false;
 
-  Widget _conditionsBtn(String btnStr, int btnColor, double btnWidth) {
-    return Padding(
-        padding: EdgeInsets.only(left: 5, right: 5, top: 10),
-        child: SizedBox(
-          width: 70,
-          height: 30,
-          child: RaisedButton(
-            onPressed: () {
-              print('Button Clicked');
-            },
-            child: Text(btnStr),
-            color: Colors.white,
-            textColor: Color(btnColor),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-                side: BorderSide(
-                  color: Color(btnColor),
-                  width: 1,
-                )),
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          ),
-        ));
+    return GestureDetector
+    (
+      child: Container(
+        child: new Icon(
+          icon,
+          size: 23,
+          color: moodPressed.value ? color : Colors.black,
+      )),
+      onTap: () 
+      {
+        setState(() 
+        {
+            if(btnType=="how_happy")
+            {
+              how_happyClick.value = true;
+              how_neutralClick.value = false;
+              how_sadClick.value = false;
+              selected_how_mood = "happy";
+            
+            }else if(btnType=="how_sad")
+            { 
+              how_sadClick.value = true;
+              how_neutralClick.value = false;
+              how_happyClick.value = false;
+              selected_how_mood = "sad";
+             
+            }else if(btnType=="how_neutral")
+            {
+              how_sadClick.value = false;
+              how_neutralClick.value = true;
+              how_happyClick.value = false;
+              selected_how_mood = "neutral";
+            }
+
+            if(btnType=="surf_happy")
+            {
+              surf_sadClick.value = false;
+              surf_neutralClick.value = false;
+              surf_happyClick.value = true;
+              selected_surf_mood = "happy";
+            }else if(btnType=="surf_sad")
+            { 
+              surf_sadClick.value = true;
+              surf_neutralClick.value = false;
+              surf_happyClick.value = false;
+              selected_surf_mood = "sad";
+            }else if(btnType=="surf_neutral")
+            {
+              surf_sadClick.value = false;
+              surf_neutralClick.value = true;
+              surf_happyClick.value = false;
+              selected_surf_mood = "neutral";
+            }
+
+            if(btnType=="wave_happy")
+            {
+              wave_sadClick.value = false;
+              wave_neutralClick.value = false;
+              wave_happyClick.value = true;
+              selected_wave_mood = "happy";
+            }else if(btnType=="wave_sad")
+            { 
+              wave_sadClick.value = true;
+              wave_neutralClick.value = false;
+              wave_happyClick.value = false;
+              selected_wave_mood = "sad";
+            }else if(btnType=="wave_neutral")
+            {
+              wave_sadClick.value = false;
+              wave_neutralClick.value = true;
+              wave_happyClick.value = false;
+              selected_wave_mood = "neutral";
+            }
+
+             if(btnType=="wind_happy")
+            {
+              wind_sadClick.value = false;
+              wind_neutralClick.value = false;
+              wind_happyClick.value = true;
+              selected_wind_mood = "happy";
+            }else if(btnType=="wind_sad")
+            { 
+              wind_sadClick.value = true;
+              wind_neutralClick.value = false;
+              wind_happyClick.value = false;
+              selected_wind_mood = "sad";
+            }else if(btnType=="wind_neutral")
+            {
+              wind_sadClick.value = false;
+              wind_neutralClick.value = true;
+              wind_happyClick.value = false;
+              selected_wind_mood = "neutral";
+            }
+
+             if(btnType=="crowd_happy")
+            {
+              crowd_sadClick.value = false;
+              crowd_neutralClick.value = false;
+              crowd_happyClick.value = true;
+              selected_crowd_mood = "happy";
+            }else if(btnType=="crowd_sad")
+            { 
+              crowd_sadClick.value = true;
+              crowd_neutralClick.value = false;
+              crowd_happyClick.value = false;
+              selected_crowd_mood = "sad";
+            }else if(btnType=="crowd_neutral")
+            {
+              crowd_sadClick.value = false;
+              crowd_neutralClick.value = true;
+              crowd_happyClick.value = false;
+              selected_crowd_mood = "neutral";
+            }
+
+            print("selected_how_mood: " + selected_how_mood);
+            print("selected_surf_mood: " + selected_surf_mood);
+            print("selected_wave_mood: " + selected_wave_mood);
+            print("selected_wind_mood: " + selected_wind_mood);
+            print("selected_crowd_mood: " + selected_crowd_mood);
+            mood = selected_how_mood;
+        });
+      }      
+      );
   }
 
   Widget _conditionText(String str) {
@@ -241,7 +365,7 @@ class CreateNewPostState extends State<CreateNewPost> {
               color: Colors.black,
               fontSize: 13,
               //fontWeight: FontWeight.w500
-            )));
+    )));
   }
 
   Widget _surfConditionTable() {
@@ -270,87 +394,79 @@ class CreateNewPostState extends State<CreateNewPost> {
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick),
+               child: _conditionIcon( TablerIcons.mood_happy, Color(0XFF52DB69), how_happyClick,how_happy_stat, how_happy,),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_neutral, Color(0XFFFE9E12), how_sadClick),
+                   TablerIcons.mood_neutral, Color(0XFFFE9E12), how_neutralClick,how_neutral_stat,how_neutral),
             )),
             TableCell(
                 child: Center(
               child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, how_neutralClick),
+                  TablerIcons.mood_neutral, Colors.redAccent, how_sadClick,how_sad_stat,how_sad),
+
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Surf condition\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), surf_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy, Color(0XFF52DB69), surf_happyClick,surf_happy_stat, surf_happy,),
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_neutral, Color(0XFFFE9E12), surf_sadClick),
+                  child: _conditionIcon( TablerIcons.mood_neutral, Color(0XFFFE9E12), surf_neutralClick,surf_neutral_stat, surf_neutral,),
             )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, surf_neutralClick),
+                  child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, surf_sadClick,surf_sad_stat, surf_sad,),
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Wave height\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), wave_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), wave_happyClick,wave_happy_stat, wave_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), wave_sadClick))),
+                    child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), wave_neutralClick,wave_neutral_stat, wave_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, wave_neutralClick),
+                    child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, wave_sadClick,wave_sad_stat, wave_sad,),
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Wind speed\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), wind_happyClick),
+                  child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), wind_happyClick,wind_happy_stat, wind_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), wind_sadClick))),
+                   child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), wind_neutralClick,wind_neutral_stat, wind_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, wind_neutralClick),
+                   child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, wind_sadClick,wind_sad_stat, wind_sad,),
+
             )),
           ]),
           TableRow(children: [
             TableCell(child: _conditionText("Crowd level\n")),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_happy, Color(0XFF52DB69), crowd_happyClick),
+                    child: _conditionIcon( TablerIcons.mood_happy,Color(0XFF52DB69), crowd_happyClick,crowd_happy_stat, crowd_happy,),
             )),
             TableCell(
                 child: Center(
-                    child: _conditionIcon(TablerIcons.mood_neutral,
-                        Color(0XFFFE9E12), crowd_sadClick))),
+                    child: _conditionIcon( TablerIcons.mood_neutral,Color(0XFFFE9E12), crowd_neutralClick,crowd_neutral_stat, crowd_neutral,),
+            )),
             TableCell(
                 child: Center(
-              child: _conditionIcon(
-                  TablerIcons.mood_sad, Colors.redAccent, crowd_neutralClick),
+                    child: _conditionIcon( TablerIcons.mood_sad,Colors.redAccent, crowd_sadClick,crowd_sad_stat, crowd_sad,),
             )),
           ]),
         ],
@@ -750,10 +866,26 @@ class CreateNewPostState extends State<CreateNewPost> {
 
   // Save data to database
   void _postBtn() async {
-    moveToLastScreen();
+    await Firebase.initializeApp();
+
+    String fileName = path.basename(image1.path);
+    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
+    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+    var url  = await taskSnapshot.ref.getDownloadURL();
+    String imageURL = url.toString();
+    print(imageURL);
+
+    String userUID = FirebaseAuth.instance.currentUser.uid;
+    LocationData locationData = new LocationData(locationUID: widget.locationUID);
+    PostData postData = new PostData();
+    String postUID = await postData.createPost(userUID, widget.locationUID, contentsController.text, imageURL, mood);
+    locationData.addPost(postUID);
+
+    Navigator.pop(context, true);
   }
 
   void _cancelBtn() async {
-    moveToLastScreen();
-  }
+    Navigator.pop(context, true);
+}
 }

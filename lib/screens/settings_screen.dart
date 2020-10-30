@@ -82,10 +82,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(
               height: 18,
             ),
-            option_btn(TablerIcons.info_circle, "About"),
-            SizedBox(
-              height: 18,
-            ),
+            // option_btn(TablerIcons.info_circle, "About"),
+            // SizedBox(
+            //   height: 18,
+            // ),
             option_btn(TablerIcons.logout, "Log Out"),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wesurf/screens/home.dart';
 import 'package:wesurf/screens/register_screen.dart';
+import 'package:wesurf/components/onboarding.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -250,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   User user = userCredential.user;
                   //_pageController.jumpToPage(3);
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Home()));
+                      context, MaterialPageRoute(builder: (context) => OnBoarding(user: user)));
                 }
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-notfound') {

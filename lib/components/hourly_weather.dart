@@ -90,12 +90,12 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
                   Row(
                     children: [
                       Image.asset(
-                        'assets/rain-100.png',
+                        'assets/rain-${weatherInfo.getRainChance(widget.rainChance).toString()}.png',
                         height: 15,
                         width: 15,
                       ),
                       Text(
-                          weatherInfo.getRainChance(widget.rainChance).toString()+"%",
+                          weatherInfo.convertChanceOfRain(widget.rainChance).toString()+"%",
                           style:TextStyle(
                               fontSize:12,
                               fontWeight: FontWeight.bold,
@@ -218,7 +218,7 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
 class WeatherInfo {
 
   String getHour(int time) {
-    DateTime dateTime = new DateTime.fromMillisecondsSinceEpoch(time * 1000);
+    DateTime dateTime = new DateTime.fromMillisecondsSinceEpoch(time * 1000).toLocal();
     var format = new DateFormat("j");
     var hourString = format.format(dateTime);
     return hourString;
@@ -227,25 +227,25 @@ class WeatherInfo {
   //Convert chance of rain
   int convertChanceOfRain(double pop) {
     int chanceOfRain = (pop * 100).toInt();
-    print(chanceOfRain);
     return chanceOfRain;
   }
 
   //Get icon according to chance of rain
   int getRainChance (double rainChance) {
-    if (rainChance >= 0 && rainChance < 25)
+    if (rainChance >= 0 && rainChance < 0.25)
       return 0;
-    else if (rainChance >= 25 && rainChance < 50)
+    else if (rainChance >= 0.25 && rainChance < 0.50)
       return 25;
-    else if (rainChance >= 50 && rainChance < 75)
+    else if (rainChance >= 0.50 && rainChance < 0.75)
       return 50;
-    else if (rainChance >= 75 && rainChance < 100)
+    else if (rainChance >= 0.75 && rainChance < 1.00)
       return 75;
     return 100;
   }
 
   //Get condition + icon according to weather condition
   String getWeatherCondition(int weatherCode) {
+    // print("weatherCode: $weatherCode");
     if (weatherCode >= 200 && weatherCode <= 299)
       return "Storm";
     else if (weatherCode >= 300 && weatherCode <= 399)

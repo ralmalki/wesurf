@@ -39,19 +39,19 @@ class _OnBoardingState extends State<OnBoarding> {
               },
               showSkipButton: true,
               skip: const Text("Skip",
-                  style: TextStyle(fontSize: 15, color: Colors.black38)),
+                  style: TextStyle(fontSize: 16, color: Colors.black38)),
               done: const Text("Get started",
                   style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: 16,
                       color: Colors.blueAccent)),
               dotsDecorator: DotsDecorator(
-                  size: const Size.square(10),
+                  size: const Size.square(12),
                   shape: CircleBorder(),
                   activeSize: Size.square(16),
                   activeColor: Colors.blueAccent,
                   color: Colors.black26,
-                  spacing: const EdgeInsets.symmetric(horizontal: 6),
+                  spacing: const EdgeInsets.symmetric(horizontal: 8),
                   activeShape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0))))),
     );
@@ -64,13 +64,12 @@ class _OnBoardingState extends State<OnBoarding> {
           imagePadding: EdgeInsets.fromLTRB(0, 50, 0, 0),
           imageFlex: 2,
           bodyTextStyle: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
           ),
-          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
         ),
         title: "Surf",
-        // title: "Surf",
-        body: lorem,
+        body: "All up to date information for your favorite surf spots in one place",
         image: Image.asset('assets/boarding-1.png', fit: BoxFit.fitWidth),
       ),
       PageViewModel(
@@ -78,12 +77,12 @@ class _OnBoardingState extends State<OnBoarding> {
           imagePadding: EdgeInsets.fromLTRB(0, 50, 0, 0),
           imageFlex: 2,
           bodyTextStyle: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
           ),
-          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
         ),
         title: "Safe",
-        body: lorem,
+        body: "Receive instant notification about surf spots",
         image: Image.asset('assets/boarding-2.png', fit: BoxFit.fitWidth),
       ),
       PageViewModel(
@@ -91,12 +90,12 @@ class _OnBoardingState extends State<OnBoarding> {
           imagePadding: EdgeInsets.fromLTRB(0, 50, 0, 0),
           imageFlex: 2,
           bodyTextStyle: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
           ),
-          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+          titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
         ),
         title: "Share",
-        body: lorem,
+        body: "Stay connected with your local surfing community",
         image: Image.asset('assets/boarding-3.png', fit: BoxFit.fitWidth),
       ),
     ];

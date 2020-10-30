@@ -264,7 +264,7 @@ class ReportDangerState extends State<ReportDanger> {
               padding: const EdgeInsets.all(0),
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CreateNewPost()));
+                    MaterialPageRoute(builder: (context) => CreateNewPost(id)));
               },
               textColor: Color(0xFF3478F6),
               child: Container(
