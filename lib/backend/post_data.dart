@@ -12,8 +12,6 @@ class PostData {
     //record the current time as post uid to link with location
     //also can be used to record time later on
 
-    List<String> comments = [];
-
     String timestamp = DateTime.now().toString();
     String postUID = userUID + timestamp;
     await postCollection.doc(postUID).set({
@@ -23,7 +21,7 @@ class PostData {
       'image' : imageURL,
       'mood' : mood,
       'timestamp' : timestamp,
-      'comments' : comments
+      'comments' : []
     });
     return postUID;
   }

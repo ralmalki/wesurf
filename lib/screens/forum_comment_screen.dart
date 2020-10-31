@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -35,11 +37,8 @@ class Forum_comment extends StatefulWidget {
 
 class Forum_commentState extends State<Forum_comment> 
 {
-
+  StreamController<List<Widget>> streamController = StreamController.broadcast();
   TextEditingController commentController = TextEditingController();
-  // Icon mood_happy =Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
-  // Icon mood_neutral =Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
-  // Icon mood_sad = Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
 
   String timeFromNow(String t) {
     DateTime timestamp = DateTime.parse(t);
@@ -217,7 +216,11 @@ class Forum_commentState extends State<Forum_comment>
                 style: TextStyle(fontSize: 12, color: Colors.black),
               ),
             ),
-            Image.network(widget.forum_img),
+            Image.network(
+                widget.forum_img,
+                height: MediaQuery.of(context).size.height * 0.25,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fitWidth),
             // Container(
             //   padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
             //   child: _forumBottomTable(),
@@ -369,6 +372,7 @@ class Forum_commentState extends State<Forum_comment>
     String commentUID = await commentData.createComment(userUID, widget.postUID, commentController.text);
     postData.addComment(commentUID);
     print("post button pressed");
+    streamController.add(List<Container>());
     commentController.clear();
     //Navigator.pop(context, true);
   }
@@ -414,65 +418,50 @@ class Forum_commentState extends State<Forum_comment>
           
         backgroundColor: Colors.white,
       ),
-      body:FutureBuilder(
-        future: fetchComment(widget.postUID),
+      body:StreamBuilder(
+        stream: streamController.stream,
         builder: (context, snapshot) {
-          print(snapshot.data.toString());
-          if (snapshot.hasData) {
-            List<Widget> commentList = snapshot.data;
-            return Column(
-              children: [
-                _ForumCard(
-                    widget.username,
-                    'assets/profile_pic2.png',
-                    widget.forum_img,
-                    widget.location,
-                    widget.post_time,
-                    widget.mood_icon
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: commentList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return commentList[index];
-                      }
-                  ),
-                ),
-              ],
-            );
-          }
-          else return SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator());
-        }
-
-      )
+          return FutureBuilder(
+              future: fetchComment(widget.postUID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<Widget> commentList = snapshot.data;
+                  return Column(
+                    children: [
+                      _ForumCard(
+                          widget.username,
+                          'assets/profile_pic2.png',
+                          widget.forum_img,
+                          widget.location,
+                          widget.post_time,
+                          widget.mood_icon
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: commentList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return commentList[index];
+                            }
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                else
+                  return SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator());
+              }
+          );
+        })
    );
   }
 
-  Widget _commentListView() {
-    return Container(
-      child: FutureBuilder(
-        future: fetchComment(widget.postUID),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Widget> commentList = snapshot.data;
-            return ListView.builder(
-                itemCount: commentList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return commentList[index];
-                }
-            );
-          } else {
-            return SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator());
-          }
-        },
-      ),
-    );
+  @override
+  void dispose() {
+    streamController.close();
+    super.dispose();
   }
 
 }

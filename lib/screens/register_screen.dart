@@ -196,8 +196,10 @@ class _MyHomePageState extends State<MyHomePage> {
               //     .updateOrAddUserName(nameController.text);
               await UserData(uid: user.uid)
                   .updateOrAddUserName(nameController.text);
+              print(user.metadata.lastSignInTime);
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => OnBoarding()));
+              Navigator.pop(context);
             } on FirebaseAuthException catch (e) {
               if (e.code == 'weak-password') {
                 print('The password is weak');

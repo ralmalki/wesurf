@@ -245,7 +245,12 @@ class WeatherInfo {
       return "Storm";
     else if (weatherCode >= 300 && weatherCode <= 399)
       return "Drizzle";
-    else if (weatherCode >= 500 && weatherCode <= 599) return "Rain";
+    else if (weatherCode >= 500 && weatherCode <= 599)
+      return "Rain";
+    else if (weatherCode >= 700 && weatherCode <= 799)
+      return "Foggy";
+    else if (weatherCode == 800)
+      return "Clear";
     return "Cloudy";
   }
 

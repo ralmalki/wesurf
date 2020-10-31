@@ -245,12 +245,16 @@ class WeatherInfo {
 
   //Get condition + icon according to weather condition
   String getWeatherCondition(int weatherCode) {
-    // print("weatherCode: $weatherCode");
     if (weatherCode >= 200 && weatherCode <= 299)
       return "Storm";
     else if (weatherCode >= 300 && weatherCode <= 399)
       return "Drizzle";
-    else if (weatherCode >= 500 && weatherCode <= 599) return "Rain";
+    else if (weatherCode >= 500 && weatherCode <= 599)
+      return "Rain";
+    else if (weatherCode >= 700 && weatherCode <= 799)
+      return "Foggy";
+    else if (weatherCode == 800)
+      return "Clear";
     return "Cloudy";
   }
 

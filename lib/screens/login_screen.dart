@@ -249,6 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         password: passwordController.text);
                 if (userCredential != null) {
                   User user = userCredential.user;
+                  print(user.metadata.lastSignInTime);
                   //_pageController.jumpToPage(3);
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => OnBoarding(user: user)));

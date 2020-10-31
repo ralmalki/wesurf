@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -30,6 +32,8 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   double lat;
   double long;
 
+  StreamController<List<Widget>> streamController = StreamController.broadcast();
+
   Future<String> getForecast() async {
     String url =
         "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$long&appid=$appid&units=metric";
@@ -53,7 +57,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     String postUID;
     String locationName;
     String content;
-    var image;
+    var image = null;
     String mood;
     var timestamp;
     String userName;
@@ -85,8 +89,9 @@ class _TabBarWidgetState extends State<TabBarWidget> {
             timeFromNow(timestamp),
             getMood(mood)));
       }
+      streamController.add(ForumCards);
     });
-    return ForumCards;
+    return ForumCards.reversed.toList();
   }
 
   Widget getMood(String mood) {
@@ -160,6 +165,10 @@ class _TabBarWidgetState extends State<TabBarWidget> {
       weatherCondition = "drizzle";
     else if (weatherCode >= 500 && weatherCode <= 599)
       weatherCondition = "rain";
+    else if (weatherCode >= 700 && weatherCode <= 799)
+      weatherCondition = "foggy";
+    else if (weatherCode == 800)
+      weatherCondition = "clear";
     else
       weatherCondition = "cloudy";
 
@@ -514,24 +523,52 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   }
 
   Widget _postListView(BuildContext context) {
+    // return Container(
+    //   child: FutureBuilder(
+    //     future: fetchPost(widget.id),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.hasData) {
+    //         List<Widget> postList = snapshot.data;
+    //         List<Widget> postListR = postList.reversed.toList();
+    //         return ListView.builder(
+    //             itemCount: postList.length,
+    //             itemBuilder: (BuildContext context, int index) {
+    //               return postListR[index];
+    //             }
+    //         );
+    //       } else {
+    //         return SizedBox(
+    //             height: 20,
+    //             width: 20,
+    //             child: CircularProgressIndicator());
+    //       }
+    //     },
+    //   ),
+    // );
     return Container(
-      child: FutureBuilder(
-        future: fetchPost(widget.id),
+      child: StreamBuilder(
+        stream: streamController.stream,
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Widget> postList = snapshot.data;
-            return ListView.builder(
-                itemCount: postList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return postList[index];
-                }
-            );
-          } else {
-            return SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator());
-          }
+          return FutureBuilder(
+            future: fetchPost(widget.id),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<Widget> postList = snapshot.data;
+                List<Widget> postListR = postList;
+                return ListView.builder(
+                    itemCount: postList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return postListR[index];
+                    }
+                );
+              } else {
+                return SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator());
+              }
+            },
+          );
         },
       ),
     );
@@ -549,14 +586,25 @@ class _TabBarWidgetState extends State<TabBarWidget> {
         child: Column(
           children: [
             _userInfo(username, profile_img, location, post_time, mood_icon),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10.0, 0, 10, 10),
-              child: new Text(
-                content,
-                style: TextStyle(fontSize: 12, color: Colors.black),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 0, 15, 15),
+                child: new Text(
+                  content,
+                  style: TextStyle(fontSize: 12, color: Colors.black),
+                ),
               ),
             ),
-            Image.network(forum_img),
+            forum_img != ""
+                ? Image.network(
+                    forum_img,
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    width: MediaQuery.of(context).size.width,
+                    fit: BoxFit.fitWidth
+                  )
+                : Container()
+            ,
             Container(
               padding: EdgeInsets.fromLTRB(14, 5, 0, 0),
               child: _forumBottomTable(
@@ -811,6 +859,13 @@ class _TabBarWidgetState extends State<TabBarWidget> {
         }
     );
   }
+
+  @override
+  void dispose() {
+    streamController.close();
+    super.dispose();
+  }
+
 }
 
 class WeatherBreakDown extends StatelessWidget {
@@ -851,4 +906,5 @@ class WeatherBreakDown extends StatelessWidget {
       ),
     );
   }
+
 }

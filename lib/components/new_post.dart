@@ -867,14 +867,17 @@ class CreateNewPostState extends State<CreateNewPost> {
   // Save data to database
   void _postBtn() async {
     await Firebase.initializeApp();
+    String imageURL = "";
 
-    String fileName = path.basename(image1.path);
-    StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
-    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-    var url  = await taskSnapshot.ref.getDownloadURL();
-    String imageURL = url.toString();
-    print(imageURL);
+    if (image1 != null) {
+      String fileName = path.basename(image1.path);
+      StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('photos/$fileName');
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(image1);
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      var url  = await taskSnapshot.ref.getDownloadURL();
+      imageURL = url.toString();
+      print(imageURL);
+    }
 
     String userUID = FirebaseAuth.instance.currentUser.uid;
     LocationData locationData = new LocationData(locationUID: widget.locationUID);
