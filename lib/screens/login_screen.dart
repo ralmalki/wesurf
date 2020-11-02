@@ -7,6 +7,7 @@ import 'package:wesurf/components/onboarding.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:wesurf/backend/user_data.dart';
 import 'map_screen.dart';
 
 class Login extends StatefulWidget {
@@ -36,9 +37,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController nameController =
-      TextEditingController(text: "test@test.com");
+      TextEditingController(text: "hayden@me.com");
   TextEditingController passwordController =
-      TextEditingController(text: "test123");
+      TextEditingController(text: "123456");
   bool isChecked = false;
   var resultHolder = 'Checkbox is UN-CHECKED';
   PageController _pageController = PageController();
@@ -251,8 +252,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   User user = userCredential.user;
                   print(user.metadata.lastSignInTime);
                   //_pageController.jumpToPage(3);
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => OnBoarding(user: user)));
+                  bool firstTime = true;
+                  await UserData(uid: FirebaseAuth.instance.currentUser.uid)
+                    .firstTime()
+                    .then((value) {
+                      firstTime = value;
+                  });
+                  if (firstTime)
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => OnBoarding(user: user)));
+                  else
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => Home()));
                 }
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-notfound') {

@@ -6,6 +6,7 @@ import './new_post.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wesurf/backend/location_data.dart';
 
 class ReportDanger extends StatefulWidget {
   @override
@@ -131,7 +132,8 @@ class ReportDangerState extends State<ReportDanger> {
                                     .doc(id)
                                     .update({'uv': FieldValue.increment(1)});
                               }
-
+                              print(id);
+                              LocationData(locationUID: id).updateDanger();
                               print("\n");
                             },
                             textColor: Color(0xFF343434),

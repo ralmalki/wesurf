@@ -26,7 +26,7 @@ class PostData {
     return postUID;
   }
 
-  Future addComment(String commentUID) async {
+  void addComment(String commentUID) async {
     //print(commentUID);
     return await postCollection
         .doc(postUID)

@@ -120,6 +120,7 @@ class _MapScreenState extends State<MapScreen> {
             return CircularProgressIndicator();
           }
           for (var location in snapshot.data.documents) {
+            // print(location.data());
             BitmapDescriptor pin = greenPin;
             if (location.get('dangerous')) pin = redPin;
             GeoPoint geo = location.get('coord');
@@ -141,7 +142,9 @@ class _MapScreenState extends State<MapScreen> {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
                 mapController.setMapStyle(_mapStyle);
-                allMarkers.forEach((element) {});
+                allMarkers.forEach((element) {
+                  // print(element.toString());
+                });
               },
               initialCameraPosition: CameraPosition(
                 target: currentLocation,

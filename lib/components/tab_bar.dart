@@ -523,28 +523,6 @@ class _TabBarWidgetState extends State<TabBarWidget> {
   }
 
   Widget _postListView(BuildContext context) {
-    // return Container(
-    //   child: FutureBuilder(
-    //     future: fetchPost(widget.id),
-    //     builder: (context, snapshot) {
-    //       if (snapshot.hasData) {
-    //         List<Widget> postList = snapshot.data;
-    //         List<Widget> postListR = postList.reversed.toList();
-    //         return ListView.builder(
-    //             itemCount: postList.length,
-    //             itemBuilder: (BuildContext context, int index) {
-    //               return postListR[index];
-    //             }
-    //         );
-    //       } else {
-    //         return SizedBox(
-    //             height: 20,
-    //             width: 20,
-    //             child: CircularProgressIndicator());
-    //       }
-    //     },
-    //   ),
-    // );
     return Container(
       child: StreamBuilder(
         stream: streamController.stream,
