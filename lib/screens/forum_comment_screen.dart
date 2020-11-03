@@ -421,38 +421,40 @@ class Forum_commentState extends State<Forum_comment>
       body:StreamBuilder(
         stream: streamController.stream,
         builder: (context, snapshot) {
-          return FutureBuilder(
-              future: fetchComment(widget.postUID),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<Widget> commentList = snapshot.data;
-                  return Column(
-                    children: [
-                      _ForumCard(
-                          widget.username,
-                          'assets/profile_pic2.png',
-                          widget.forum_img,
-                          widget.location,
-                          widget.post_time,
-                          widget.mood_icon
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                            itemCount: commentList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return commentList[index];
-                            }
+          return Center(
+            child: FutureBuilder(
+                future: fetchComment(widget.postUID),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<Widget> commentList = snapshot.data;
+                    return Column(
+                      children: [
+                        _ForumCard(
+                            widget.username,
+                            'assets/profile_pic2.png',
+                            widget.forum_img,
+                            widget.location,
+                            widget.post_time,
+                            widget.mood_icon
                         ),
-                      ),
-                    ],
-                  );
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: commentList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return commentList[index];
+                              }
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  else
+                    return SizedBox(
+                        height: 10,
+                        width: 10,
+                        child: new CircularProgressIndicator());
                 }
-                else
-                  return SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator());
-              }
+            ),
           );
         })
    );

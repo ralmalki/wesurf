@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import "package:flutter/material.dart";
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SecurityPage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class SecurityPageState extends State<SecurityPage> {
   TextEditingController currentPwdController = TextEditingController();
   TextEditingController newPwdController = TextEditingController();
   TextEditingController confirdPwdController = TextEditingController();
+
   void _changed(bool visibility, String field) {
     setState(() {
       if (field == "tag") {
@@ -191,6 +193,16 @@ class SecurityPageState extends State<SecurityPage> {
     );
   }
 
+  void updatePwd() {
+    User user = FirebaseAuth.instance.currentUser;
+    // try {
+    //   if (user.)
+    // } catch (e) {
+    //
+    // }
+    user.updatePassword(newPwdController.text);
+  }
+
   Widget _save_btn(String btn_str) {
     return FlatButton(
       child: Column(
@@ -211,6 +223,7 @@ class SecurityPageState extends State<SecurityPage> {
         borderRadius: BorderRadius.circular(10),
       ),
       onPressed: () {
+        updatePwd();
         visibilityObs ? null : _changed(true, "obs");
       },
     );

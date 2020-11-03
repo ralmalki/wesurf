@@ -11,7 +11,6 @@ class PostData {
   Future<String> createPost(String userUID, String locationUID, String content, String imageURL, String mood) async {
     //record the current time as post uid to link with location
     //also can be used to record time later on
-
     String timestamp = DateTime.now().toString();
     String postUID = userUID + timestamp;
     await postCollection.doc(postUID).set({

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'forum_comment_screen.dart';
 
 class FeedsScreen extends StatefulWidget {
   @override
@@ -7,6 +10,85 @@ class FeedsScreen extends StatefulWidget {
 }
 
 class _FeedsScreenState extends State<FeedsScreen> {
+
+  Widget getMood(String mood) {
+    if (mood == 'happy')
+      return Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
+    else if (mood == 'neutral')
+      return Icon(TablerIcons.mood_neutral, size: 15, color: Color(0XFFFE9E12));
+    return Icon(TablerIcons.mood_sad, size: 15, color: Colors.red);
+  }
+
+  String timeFromNow(String t) {
+    DateTime timestamp = DateTime.parse(t);
+    Duration duration = DateTime.now().difference(timestamp);
+    if (duration.inSeconds > 60) {
+      if (duration.inMinutes > 60) {
+        if (duration.inHours > 24) {
+          return '${duration.inDays} days ago';
+        }
+        else
+          return '${duration.inHours} hours ago';
+      }
+      else
+        return '${duration.inMinutes} minutes ago';
+    }
+    return 'Just now';
+  }
+
+  Future<List<Widget>> fetchPost() async {
+    Firebase.initializeApp();
+    var locationInstance = FirebaseFirestore.instance.collection('locations');
+    var postInstance = FirebaseFirestore.instance.collection('posts');
+    var userInstance = FirebaseFirestore.instance.collection('users');
+
+    String locationUID;
+    String locationName;
+    String content;
+    var image = null;
+    String mood;
+    var timestamp;
+    String userUID;
+    String userName;
+
+    List<Widget> UserPosts = new List<Widget>();
+    await postInstance.get().then((posts) async {
+      for (var post in posts.docs) {
+        content = post.data()['content'];
+        image = post.data()['image'];
+        mood = post.data()['mood'];
+        timestamp = post.data()['timestamp'];
+        locationUID = post.data()['locationUID'];
+        await locationInstance.doc(locationUID).get().then((location)
+          => locationName = location.data()['name']);
+        userUID = post.data()['userUID'];
+        await userInstance.doc(userUID).get().then((userValue)
+          => userName = userValue.data()['name']);
+
+        UserPosts.add(UserPost(
+            post.id,
+            userName,
+            getMood(mood),
+            locationName,
+            timeFromNow(timestamp),
+            'assets/profile_pic.png',
+            image,
+            content,
+            59,
+            24,
+            120
+        ));
+      }
+    });
+
+    return UserPosts.reversed.toList();
+  }
+
+  @override
+  void initState() {
+    fetchPost();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,33 +100,27 @@ class _FeedsScreenState extends State<FeedsScreen> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: Container(
-          color: Color(0xFFF2F2F7),
-          child: ListView(children: [
-            SizedBox(height: 10),
-            UserPost(
-                // String userdetails(name), String reaction, String location, int timeAgo, String imageURI (icon), mediaURI (post photos), int drops, int replies, int views
-                "Blue Whittle",
-                "sad",
-                "North Wollongong Beach",
-                21,
-                "https://images.unsplash.com/photo-1523419409543-a5e549c1faa8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1886&q=80",
-                "https://assets.atdw-online.com.au/images/126d248fcc766b1acc3a61a74dff6023.jpeg?rect=0,0,2048,1536&w=745&h=559&&rot=360",
-                23,
-                4,
-                42),
-            UserPost(
-                // String userdetails (name), String reaction, String location, int timeAgo, String imageURI (icon), mediaURI (post photos),int drops, int replies, int views
-                "Selena Mcclain",
-                "happy",
-                "Warilla Beach",
-                28,
-                "https://images.unsplash.com/photo-1525879000488-bff3b1c387cf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1868&q=80",
-                "https://illawarrasurfacademy.com.au/wp-content/uploads/2017/03/Warilla-Beach.jpg",
-                33,
-                10,
-                60)
-          ])),
+      body: Center(
+        child: FutureBuilder(
+          future: fetchPost(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var feedData = snapshot.data;
+              return Container(
+                  color: Color(0xFFF2F2F7),
+                  child: ListView.builder(
+                    itemCount: feedData.length,
+                    itemBuilder: (context, index) {
+                      return feedData[index];
+                    }
+                  )
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        ),
+      )
     );
   }
 
@@ -61,12 +137,14 @@ class _FeedsScreenState extends State<FeedsScreen> {
 
   /* Main User Post builder function */
   Widget UserPost(
-      String userdetails,
-      String reaction,
+      String postUID,
+      String username,
+      Icon reaction,
       String location,
-      int timeAgo,
-      String imageURI,
-      String mediaURI,
+      String timeAgo,
+      String avatar,
+      String image,
+      String content,
       int drops,
       int replies,
       int views) {
@@ -78,40 +156,33 @@ class _FeedsScreenState extends State<FeedsScreen> {
         children: [
           Row(
             children: [
-              //* User avatar
-              IconButton(
-                  icon: Container(
-                      decoration: new BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: new DecorationImage(
-                              fit: BoxFit.fill,
-                              image: NetworkImage(imageURI)))),
-                  iconSize: 40,
-                  onPressed: () => null),
-
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                child: Image.asset(avatar, height: 40, width: 40),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     // *User name
-                    Text(userdetails,
+                    Text(username,
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold)),
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                     SizedBox(width: 3),
                     // *Reaction Icon
-                    Image.asset(
-                      getReaction(reaction),
-                      height: 17.5,
-                    )
+                    reaction
                   ]),
                   Text(
                       // *Location and time info
-                      location + "  ●  " + timeAgo.toString() + "m ago ",
-                      style: TextStyle(fontSize: 10)),
+                      location,
+                      style: TextStyle(color: Color(0xff999999), fontSize: 11)),
+                  Text(
+                    // *Location and time info
+                      timeAgo,
+                      style: TextStyle(color: Color(0xff999999), fontSize: 11)),
                 ],
               ),
               Spacer(),
-
               Container(
                   padding: EdgeInsets.only(bottom: 25),
                   child: Column(
@@ -134,13 +205,7 @@ class _FeedsScreenState extends State<FeedsScreen> {
             children: [
               Expanded(
                   // *Post's text
-                  child: Text(
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam"
-                " erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et"
-                " ea rebum.",
-                style: TextStyle(
-                  fontSize: 14,
-                ),
+                  child: Text(content, style: TextStyle(fontSize: 14),
               ))
             ],
           ),
@@ -151,15 +216,14 @@ class _FeedsScreenState extends State<FeedsScreen> {
               Expanded(
                   flex: 1,
                   // *Post media
-                  child: Image.network(
-                    mediaURI,
-                    width: screenSize.width,
-                  ))
+                  child: Image.network(image)
+              )
             ],
           ),
 
           // *Function called to return widget with stats
-          PostInfoRow(drops, replies, views),
+          PostInfoRow(postUID, content, username, avatar, image, location,
+              timeAgo, reaction, drops, replies, views),
 
           Row(children: [
             // *The comment textfield container
@@ -219,7 +283,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
   }
 
   /* Sets and returns the row for the stats and icons, called in main user post widget function */
-  Widget PostInfoRow(int drops, int replies, int views) {
+  Widget PostInfoRow(String postUID, String content, String username, String profile_img,
+      String forum_img, String location, String post_time, Icon mood_icon, int drops, int replies, int views) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -232,6 +297,18 @@ class _FeedsScreenState extends State<FeedsScreen> {
             )),
           ),
           IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Forum_comment(
+                    postUID,
+                    content,
+                    username,
+                    profile_img,
+                    forum_img,
+                    location,
+                    post_time,
+                    mood_icon
+                )));
+              },
               icon: Icon(TablerIcons.message_circle, color: Colors.black)),
           IconButton(icon: Icon(TablerIcons.share, color: Colors.black))
         ])),
