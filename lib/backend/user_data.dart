@@ -1,4 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class UserData {
   final String uid;
@@ -25,6 +29,7 @@ class UserData {
         FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot documentSnapshot = await documentReference.get();
     List<String> fav;
+    FirebaseMessaging _fcm = FirebaseMessaging();
     try {
       fav = List.from(documentSnapshot['favLocations']);
 
@@ -32,11 +37,13 @@ class UserData {
         documentReference.update({
           'favLocations': FieldValue.arrayRemove([locationUID])
         });
+        _fcm.unsubscribeFromTopic(locationUID);
         return false;
       } else {
         documentReference.update(({
           'favLocations': FieldValue.arrayUnion([locationUID])
         }));
+        _fcm.subscribeToTopic(locationUID);
       }
       return true;
     } catch (e) {
@@ -46,6 +53,7 @@ class UserData {
             {locationUID}
           ]
         });
+        _fcm.subscribeToTopic(locationUID);
       }
       print(e);
 
@@ -72,4 +80,46 @@ class UserData {
       return false;
     }
   }
+
+  Future<void> showAlertDialog(
+      BuildContext context, String title, String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // void confirmPasswordChange(String newPassword) {
+  //   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  //   User user = firebaseAuth.currentUser;
+  //
+  //   string newPassword = "SOME-SECURE-PASSWORD";
+  //   if (user != null) {
+  //     user.UpdatePasswordAsync(newPassword).ContinueWith(task => {
+  //     if (task.IsCanceled) {
+  //     Debug.LogError("UpdatePasswordAsync was canceled.");
+  //     return;
+  //     }
+  //     if (task.IsFaulted) {
+  //     Debug.LogError("UpdatePasswordAsync encountered an error: " + task.Exception);
+  //     return;
+  //     }
+  //
+  //     Debug.Log("Password updated successfully.");
+  //     });
+  //   }
+  // }
 }

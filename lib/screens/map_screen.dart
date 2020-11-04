@@ -27,7 +27,6 @@ class _MapScreenState extends State<MapScreen> {
   String _mapStyle;
   BitmapDescriptor greenPin;
   BitmapDescriptor redPin;
-  final FirebaseMessaging _fcm = FirebaseMessaging();
   StreamSubscription iosSubscription;
 /*
   Future<void> addGeoFireLocation() async {
@@ -59,49 +58,6 @@ class _MapScreenState extends State<MapScreen> {
     rootBundle.loadString('assets/map-style.txt').then((string) {
       _mapStyle = string;
     });
-
-    // MessageHandler messageHandler = new MessageHandler();
-    if (Platform.isIOS) {
-      iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
-        print(data);
-      });
-
-      _fcm.requestNotificationPermissions(IosNotificationSettings());
-    }
-
-    _fcm.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: ListTile(
-              title: Text(message['notification']['title']),
-              subtitle: Text(message['notification']['body']),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                color: Colors.amber,
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        // TODO optional
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => NotificationScreen()));
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-        // TODO optional
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => NotificationScreen()));
-      },
-    );
   }
 
   void setCustomMapPin() async {
@@ -120,6 +76,7 @@ class _MapScreenState extends State<MapScreen> {
             return CircularProgressIndicator();
           }
           for (var location in snapshot.data.documents) {
+            print(location.get('name'));
             BitmapDescriptor pin = greenPin;
             if (location.get('dangerous')) pin = redPin;
             GeoPoint geo = location.get('coord');

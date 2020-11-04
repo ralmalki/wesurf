@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import "package:flutter/material.dart";
+import 'package:wesurf/backend/user_data.dart';
 
 class SecurityPage extends StatefulWidget {
   @override
@@ -23,6 +26,14 @@ class SecurityPageState extends State<SecurityPage> {
         visibilityObs = visibility;
       }
     });
+  }
+
+  Future<void> sendRestEmail() async {
+    User user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String email = user.email;
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    }
   }
 
   @override
@@ -101,25 +112,9 @@ class SecurityPageState extends State<SecurityPage> {
                                           textfield_icon_size,
                                           Icons.lock_outline),
                                       SizedBox(
-                                        height: 15,
-                                      ),
-                                      _textfield(
-                                          "New Password",
-                                          newPwdController,
-                                          textfield_icon_size,
-                                          Icons.lock_outline),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      _textfield(
-                                          "Confirm New Password",
-                                          confirdPwdController,
-                                          textfield_icon_size,
-                                          Icons.lock_outline),
-                                      SizedBox(
                                         height: 25,
                                       ),
-                                      _save_btn("Save"),
+                                      _save_btn("Send Reset Email"),
                                       SizedBox(
                                         height: 230,
                                       ),
@@ -211,7 +206,9 @@ class SecurityPageState extends State<SecurityPage> {
         borderRadius: BorderRadius.circular(10),
       ),
       onPressed: () {
-        visibilityObs ? null : _changed(true, "obs");
+        sendRestEmail();
+        showAlertDialog(context, "Password rest",
+            "An email has been sent to you. Please follow the steps to reset your password");
       },
     );
   }
@@ -292,6 +289,27 @@ class SecurityPageState extends State<SecurityPage> {
       ),
       onPressed: () {
         //Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+      },
+    );
+  }
+
+  Future<void> showAlertDialog(
+      BuildContext context, String title, String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }

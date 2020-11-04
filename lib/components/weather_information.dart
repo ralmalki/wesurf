@@ -230,7 +230,7 @@ class _WeatherInformationState extends State<WeatherInformation> {
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Center(
                                       child: TabBarWidget(
-                                          widget.lat, widget.long)),
+                                          widget.id, widget.lat, widget.long)),
                                 )
                               ],
                             ),
@@ -329,7 +329,7 @@ Widget _Btn(
             reportDanger.build(context);
           } else if (buttonIcon == TablerIcons.plus) {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CreateNewPost()));
+                MaterialPageRoute(builder: (context) => CreateNewPost(id)));
           }
         },
       ));

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -38,6 +39,27 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+  Future<void> showAlertDialog(
+      BuildContext context, String title, String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,9 +222,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   MaterialPageRoute(builder: (context) => OnBoarding()));
             } on FirebaseAuthException catch (e) {
               if (e.code == 'weak-password') {
+                showAlertDialog(
+                    context, "Weak password", "Try to use stronger password");
                 print('The password is weak');
                 return;
               } else if (e.code == 'email-already-in-use') {
+                showAlertDialog(context, "Account already available",
+                    "The email you used is already registered, try to login");
                 print('The account already existed');
                 return;
               }

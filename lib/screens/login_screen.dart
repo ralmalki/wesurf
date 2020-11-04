@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wesurf/screens/home.dart';
@@ -41,6 +42,27 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isChecked = false;
   var resultHolder = 'Checkbox is UN-CHECKED';
   PageController _pageController = PageController();
+
+  Future<void> showAlertDialog(
+      BuildContext context, String title, String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,8 +276,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-notfound') {
-                  print('No user foun for that email');
+                  showAlertDialog(context, "Account not found",
+                      "If you don't have an account, try to create on");
+                  print('No user found for that email');
                 } else if (e.code == 'wrong-password') {
+                  showAlertDialog(
+                      context, "Error", "Email/Password dose not match!");
                   print("Wrong password provided by user");
                 }
               }
