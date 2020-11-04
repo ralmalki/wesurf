@@ -94,6 +94,7 @@ class CreateNewPostState extends State<CreateNewPost> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+          resizeToAvoidBottomPadding: false,
           appBar: new AppBar(
             title: new Text('Create New Post',
                 style: TextStyle(
@@ -208,6 +209,7 @@ class CreateNewPostState extends State<CreateNewPost> {
         height: 80,
         child: TextField(
           maxLines: 3,
+          textInputAction: TextInputAction.done,
           keyboardType: TextInputType.multiline,
           controller: contentsController,
           decoration: InputDecoration(
