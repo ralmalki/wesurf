@@ -960,4 +960,3 @@ class CreateNewPostState extends State<CreateNewPost> {
     Navigator.pop(context, true);
   }
 }
-}

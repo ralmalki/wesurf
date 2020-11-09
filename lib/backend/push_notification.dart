@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:wesurf/screens/home.dart';
+import 'package:wesurf/screens/login_screen.dart';
 
 class PushNotification extends StatefulWidget {
   @override
@@ -57,6 +58,6 @@ class _PushNotificationState extends State<PushNotification> {
 
   @override
   Widget build(BuildContext context) {
-    return Home();
+    return Login();
   }
 }

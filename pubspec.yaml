@@ -42,7 +42,6 @@ dependencies:
   intl: ^0.16.1
   introduction_screen: ^1.0.9
   cloud_functions: ^0.7.0-dev.2
-  firebase_storage: ^4.0.1
 
 dev_dependencies:
   flutter_test:

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wesurf/components/forum_comment.dart';
+import 'package:wesurf/screens/forum_comment_screen.dart';
 //import 'forum_comment_screen.dart';
 
 class FeedsScreen extends StatefulWidget {
@@ -106,28 +106,27 @@ class _FeedsScreenState extends State<FeedsScreen> {
           backgroundColor: Colors.white,
         ),
         backgroundColor: Colors.white,
-      ),
-      body: Center(
-        child: FutureBuilder(
-          future: fetchPost(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var feedData = snapshot.data;
-              return Container(
-                  color: Color(0xFFF2F2F7),
-                  child: ListView.builder(
-                    itemCount: feedData.length,
-                    itemBuilder: (context, index) {
-                      return feedData[index];
-                    }
-                  )
-              );
-            } else {
-              return CircularProgressIndicator();
-            }
-          },
-        ),
-      )
+        body: Center(
+          child: FutureBuilder(
+            future: fetchPost(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var feedData = snapshot.data;
+                return Container(
+                    color: Color(0xFFF2F2F7),
+                    child: ListView.builder(
+                      itemCount: feedData.length,
+                      itemBuilder: (context, index) {
+                        return feedData[index];
+                      }
+                    )
+                );
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
+          ),
+        )
     );
   }
 

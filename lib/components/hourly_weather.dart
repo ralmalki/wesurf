@@ -50,7 +50,7 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
             children: <Widget>[
           Text(weatherInfo.getHour(widget.time),
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: _textcolor,
               )),
@@ -68,12 +68,11 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(widget.temp.toString() + "°C",
                 style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: _textcolor)),
             Text(weatherInfo.getWeatherCondition(widget.weatherCode),
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
                     fontSize: 13,
                     color: _textcolor))
           ]),
@@ -81,7 +80,7 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
           Column(
             children: [
               Text("Chance of rain",
-                  style: TextStyle(fontSize: 12, color: _textcolor)),
+                  style: TextStyle(fontSize: 13, color: _textcolor)),
               Row(
                 children: [
                   Image.asset(
@@ -95,7 +94,7 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
                               .toString() +
                           "%",
                       style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: _textcolor))
                 ],
@@ -108,57 +107,62 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
   // The expanded weather widget with additional information
   Widget ExpandedWidget() {
     return Container(
-        margin: EdgeInsets.fromLTRB(10, 15, 10, 5),
+        margin: EdgeInsets.fromLTRB(0, 2, 0, 2),
         padding: EdgeInsets.all(8),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Image.asset(
-              'assets/wind-' +
-                  weatherInfo
-                      .getWindDirection(widget.windDegree)
-                      .toUpperCase() +
-                  '.png',
-              height: 20,
-              width: 20,
-            ),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text("Wind",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 13,
-                      )),
-                  Text(widget.windSpeed.toString() + " m/s",
-                      textAlign: TextAlign.left,
-                      style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.bold))
-                ]),
-            Image.asset(
-              'assets/humidity.png',
-              height: 20,
-              width: 20,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Text("Humidity", style: TextStyle(fontSize: 13)),
-                Text(widget.humidity.toString() + "%",
-                    style: TextStyle(fontSize: 13))
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/wind-' +
+                        weatherInfo
+                            .getWindDirection(widget.windDegree)
+                            .toUpperCase() +
+                        '.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                ),
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("Wind",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 13,
+                          )),
+                      Text(widget.windSpeed.toString() + " m/s",
+                          textAlign: TextAlign.left,
+                          style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
+                    ]
+                ),
               ],
             ),
-            // Image.asset(
-            //   'assets/UV-'+widget.uvi.round().toString()+'.png',
-            //   height: 20,
-            //   width: 20,
-            // ),
-            // Column(
-            //   children: [
-            //     Text("UV", style: TextStyle( fontSize: 13)),
-            //     Text(widget.uvi.toString(), style: TextStyle( fontSize: 13))
-            //   ],
-            // )
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/humidity.png',
+                    height: 20,
+                    width: 20,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Humidity", style: TextStyle(fontSize: 13)),
+                    Text(widget.humidity.toString() + "%",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold))
+                  ],
+                ),
+              ],
+            ),
           ],
         )
     );
