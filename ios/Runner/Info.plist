@@ -31,6 +31,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -54,17 +55,10 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<false/>
-	<key>FirebaseScreenReportingEnabled</key>
-	<true/>
-
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>Allow access to photo library</string>
-
     <key>NSCameraUsageDescription</key>
     <string>Allow access to camera to capture photos</string>
-
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow access to microphone</string>
 </dict>

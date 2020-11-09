@@ -2,6 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wesurf/backend/user_data.dart';
+import 'package:wesurf/backend/location_data.dart';
+
 class LovedSpots extends StatefulWidget {
   @override
   _LovedSpotState createState() => _LovedSpotState();
@@ -10,6 +16,37 @@ class LovedSpots extends StatefulWidget {
 class _LovedSpotState extends State {
   // Safe Spot Switch
   bool switchValue = false;
+
+  // List<SavedSpot> spots = <SavedSpot>[
+  //   SavedSpot('Fairy Meadow Beach', true),
+  //   SavedSpot('North Wollongong Beach', false),
+  //   SavedSpot('Towradgi Beach', true),
+  //   SavedSpot('Warilla Beach', false),
+  //   SavedSpot('Wollongong Beach', true),
+  // ];
+
+  Future<List> fetchFavSpots() async {
+    Firebase.initializeApp();
+    CollectionReference locationCollection = FirebaseFirestore.instance.collection('locations');
+
+    List<dynamic> favSpots =
+      await UserData(uid: FirebaseAuth.instance.currentUser.uid).getFavSpots();
+
+    List<SavedSpot> savedSpotList = List<SavedSpot>();
+    for (var spotUID in favSpots) {
+      LocationData location = LocationData(locationUID: spotUID);
+      String spotName = await location.getLocationName();
+      bool dangerous = await location.getDangerous();
+      savedSpotList.add(SavedSpot(spotName, dangerous));
+    }
+    return savedSpotList;
+  }
+
+  @override
+  void initState() {
+    fetchFavSpots();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,11 +95,15 @@ class _LovedSpotState extends State {
   }
 
   Widget _buildResultArea(bool v) {
-    return Column(
-      children: [
-        // Generate widgets based on whether only safe spots or not
-        createList(getLocations(spots, v), v)
-      ],
+    return FutureBuilder(
+      future: fetchFavSpots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return createList(getLocations(snapshot.data, v), v);
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
     );
   }
 
@@ -71,7 +112,7 @@ class _LovedSpotState extends State {
     return Column(children: [
       SearchBarLovedSpots(),
       buildFilterArea(
-        spots.length,
+        widget_list.length,
       ),
       Container(
         child: Column(children: widget_list),
@@ -85,16 +126,16 @@ class _LovedSpotState extends State {
     if (v == true) {
       // if true, safe spot
       for (var i = 0; i < spots.length; i++) {
-        if (spots[i].dangerLevel > 0 && spots[i].dangerLevel < 60) {
+        if (!spots[i].dangerous) {
           list.add(LocationWidget(
-              spots[i].name, spots[i].dangerLevel, spots[i].distance));
+              spots[i].name, spots[i].dangerous));
         }
       }
     } else {
       // else normal list
       for (var i = 0; i < spots.length; i++) {
         list.add(LocationWidget(
-            spots[i].name, spots[i].dangerLevel, spots[i].distance));
+            spots[i].name, spots[i].dangerous));
       }
     }
     return list;
@@ -153,195 +194,151 @@ class _LovedSpotState extends State {
 }
 
 /* Saved Spot Location Widget */
-Widget LocationWidget(String beachName, int dangerLevel, double distance) {
-  String getSafety(int dangerLevel) {
-    if (dangerLevel > 0 && dangerLevel < 60) {
-      return "Safe";
-    } else if (dangerLevel > 0 && dangerLevel > 70) {
-      return "Danger Warning";
-    } else if (dangerLevel < 70 && dangerLevel > 60) {
-      return "Warning";
-    } else {
-      return "No data";
-    }
-  }
-
-  // Gets the image for danger level
-  String getSmiley(int dangerLevel) {
-    if (dangerLevel > 0 && dangerLevel > 70) {
-      return 'assets/face-sad-white.png';
-    } else if (dangerLevel > 0 && dangerLevel < 60) {
-      return 'assets/face-smile-green.png';
-    } else if (dangerLevel < 70 && dangerLevel > 60) {
-      return 'assets/face-neutral-orange.png';
-    } else {
-      return "white";
-    }
-  }
-
-  // Gets colour for text
-  Color getSafetyColor(int dangerLevel) {
-    if (dangerLevel < 70 && dangerLevel > 60)
-      return Color.fromRGBO(255, 164, 53, 1);
-    else if (dangerLevel > 0 && dangerLevel < 60)
-      return Color.fromRGBO(76, 217, 100, 1);
-  }
-
-  if (dangerLevel > 70) {
-    return Container(
-        margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-        padding: EdgeInsets.fromLTRB(5, 10, 10, 10),
-        decoration: BoxDecoration(
-            color: Color.fromRGBO(255, 59, 48, 1),
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.4),
-                spreadRadius: 1,
-                blurRadius: 4,
-                offset: Offset(0, 3), // changes position of shadow
+  Widget LocationWidget(String beachName, bool dangerous) {
+    if (dangerous) {
+      return Container(
+          margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+          padding: EdgeInsets.fromLTRB(5, 10, 10, 10),
+          decoration: BoxDecoration(
+              color: Color.fromRGBO(255, 59, 48, 1),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.4),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ]),
+          child: Row(children: [
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Container(
+                child: Icon(TablerIcons.mood_sad, color: Colors.white),
               ),
-            ]),
-        child: Row(children: [
-          Container(
-            child: Column(children: [
-              Image.asset(
-                'assets/face-sad-white.png',
-                height: 40,
-                width: 40,
-              )
-            ]),
-          ),
-          Container(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(beachName,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
+            ),
+            SizedBox(width: 5, height: 5),
+            Container(
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(beachName,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white)),
+                Container(
+                    child: Row(
+                      children: [
+                        // Text(distance.toString() + " km",
+                        //     textAlign: TextAlign.left,
+                        //     style: TextStyle(fontSize: 12, color: Colors.white)),
+                        // Text("   ●   ",
+                        //     textAlign: TextAlign.left,
+                        //     style: TextStyle(fontSize: 10, color: Colors.white)),
+                        Text("Danger warning",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontSize: 12, color: Colors.white))
+                      ],
+                    ))
+              ]),
+            ),
+            Spacer(),
+            Container(
+              child: IconButton(
+                icon: Icon(TablerIcons.dots),
+                color: Colors.black,
+                onPressed: () {
+                  print("You Pressed the icon!");
+                },
+              ),
+            )
+          ]));
+    } else {
+      return Container(
+          margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+          padding: EdgeInsets.fromLTRB(5, 10, 10, 10),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.4),
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ]),
+          child: Row(children: [
+            Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: Container(
+                child: Icon(TablerIcons.mood_happy, color: Color(0XFF52DB69)),
+              ),
+            ),
+            SizedBox(width: 5, height: 5),
+            Container(
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(beachName,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                       fontSize: 16,
-                      color: Colors.white)),
-              Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: Row(
-                    children: [
-                      Text(distance.toString() + " km",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 12, color: Colors.white)),
-                      Text("   ●   ",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 10, color: Colors.white)),
-                      Text(getSafety(dangerLevel),
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 12, color: Colors.white))
-                    ],
-                  ))
-            ]),
-          ),
-          Spacer(),
-          Container(
-            child: IconButton(
-              icon: Icon(TablerIcons.dots),
-              color: Colors.black,
-              onPressed: () {
-                print("You Pressed the icon!");
-              },
+                    )),
+                Container(
+                    child: Row(
+                      children: [
+                        // Text(distance.toString() + " km",
+                        //     textAlign: TextAlign.left,
+                        //     style: TextStyle(
+                        //       fontSize: 12,
+                        //     )),
+                        // Text("   ●   ",
+                        //     textAlign: TextAlign.left,
+                        //     style: TextStyle(
+                        //       fontSize: 10,
+                        //     )),
+                        Text("Safe",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 12, color: Color.fromRGBO(76, 217, 100, 1)))
+                      ],
+                    ))
+              ]),
             ),
-          )
-        ]));
-  } else {
-    return Container(
-        margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-        padding: EdgeInsets.fromLTRB(5, 10, 10, 10),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.4),
-                spreadRadius: 1,
-                blurRadius: 4,
-                offset: Offset(0, 3), // changes position of shadow
+            Spacer(),
+            Container(
+              child: IconButton(
+                icon: Icon(TablerIcons.dots),
+                color: Colors.black,
+                onPressed: () {},
               ),
-            ]),
-        child: Row(children: [
-          Container(
-            child: Column(children: [
-              Image.asset(
-                getSmiley(dangerLevel),
-                height: 40,
-                width: 40,
-              )
-            ]),
-          ),
-          SizedBox(width: 5, height: 5),
-          Container(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(beachName,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 16,
-                  )),
-              Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: Row(
-                    children: [
-                      Text(distance.toString() + " km",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 12,
-                          )),
-                      Text("   ●   ",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 10,
-                          )),
-                      Text(getSafety(dangerLevel),
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontSize: 12, color: getSafetyColor(dangerLevel)))
-                    ],
-                  ))
-            ]),
-          ),
-          Spacer(),
-          Container(
-            child: IconButton(
-              icon: Icon(TablerIcons.dots),
-              color: Colors.black,
-              onPressed: () {},
-            ),
-          )
-        ]));
+            )
+          ]));
+    }
   }
-}
 
 /* Class SavedSpot and list of SavedSpot objects to populate widgets */
 class SavedSpot {
-  const SavedSpot(this.name, this.dangerLevel, this.distance);
+  const SavedSpot(this.name, this.dangerous);
   final String name;
-  final int dangerLevel;
-  final double distance;
+  final bool dangerous;
+  // final double distance;
 }
 
-List<SavedSpot> spots = <SavedSpot>[
-  SavedSpot('Fairy Meadow Beach', 19, 2),
-  SavedSpot('North Wollongong Beach', 79, 0.95),
-  SavedSpot('Towradgi Beach', 77, 12.6),
-  SavedSpot('Warilla Beach', 0, 15),
-  SavedSpot('Wollongong Beach', 30, 1),
-];
+// List<SavedSpot> spots = <SavedSpot>[
+//   SavedSpot('Wollongong Beach', 30, 1),
+// ];
 
 /* Search Bar */
 Widget SearchBarLovedSpots() {

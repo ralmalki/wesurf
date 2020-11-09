@@ -35,9 +35,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
               text: "New forum post at ",
               children: <TextSpan>[
                 TextSpan(
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 14,  fontWeight: FontWeight.bold),
                     text: "Towradgi Beach "),
-              ]),
+              ]
+          ),
         ),
         "1h ago",
         Colors.white,
@@ -235,9 +236,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       future: getNotification(),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         dynamic data = snapshot.data;
-                        // return Column(children: <Widget>[
-                        //   for (var location in data) Text(location.toString())
-                        // ]);
                         return Column(children: newNotification());
                       }),
                   SizedBox(height: 10),

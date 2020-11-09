@@ -264,11 +264,13 @@ class CreateNewPostState extends State<CreateNewPost> {
               surf_neutralClick.value = false;
               surf_happyClick.value = true;
               selected_surf_mood = "happy";
+
             } else if (btnType == "surf_sad") {
               surf_sadClick.value = true;
               surf_neutralClick.value = false;
               surf_happyClick.value = false;
               selected_surf_mood = "sad";
+
             } else if (btnType == "surf_neutral") {
               surf_sadClick.value = false;
               surf_neutralClick.value = true;
@@ -276,16 +278,19 @@ class CreateNewPostState extends State<CreateNewPost> {
               selected_surf_mood = "neutral";
             }
 
+
             if (btnType == "wave_happy") {
               wave_sadClick.value = false;
               wave_neutralClick.value = false;
               wave_happyClick.value = true;
               selected_wave_mood = "happy";
+
             } else if (btnType == "wave_sad") {
               wave_sadClick.value = true;
               wave_neutralClick.value = false;
               wave_happyClick.value = false;
               selected_wave_mood = "sad";
+
             } else if (btnType == "wave_neutral") {
               wave_sadClick.value = false;
               wave_neutralClick.value = true;
@@ -298,11 +303,13 @@ class CreateNewPostState extends State<CreateNewPost> {
               wind_neutralClick.value = false;
               wind_happyClick.value = true;
               selected_wind_mood = "happy";
+
             } else if (btnType == "wind_sad") {
               wind_sadClick.value = true;
               wind_neutralClick.value = false;
               wind_happyClick.value = false;
               selected_wind_mood = "sad";
+
             } else if (btnType == "wind_neutral") {
               wind_sadClick.value = false;
               wind_neutralClick.value = true;
@@ -315,11 +322,13 @@ class CreateNewPostState extends State<CreateNewPost> {
               crowd_neutralClick.value = false;
               crowd_happyClick.value = true;
               selected_crowd_mood = "happy";
+
             } else if (btnType == "crowd_sad") {
               crowd_sadClick.value = true;
               crowd_neutralClick.value = false;
               crowd_happyClick.value = false;
               selected_crowd_mood = "sad";
+
             } else if (btnType == "crowd_neutral") {
               crowd_sadClick.value = false;
               crowd_neutralClick.value = true;
@@ -345,7 +354,7 @@ class CreateNewPostState extends State<CreateNewPost> {
               color: Colors.black,
               fontSize: 13,
               //fontWeight: FontWeight.w500
-            )));
+    )));
   }
 
   Widget _surfConditionTable() {
@@ -950,4 +959,5 @@ class CreateNewPostState extends State<CreateNewPost> {
   void _cancelBtn() async {
     Navigator.pop(context, true);
   }
+}
 }

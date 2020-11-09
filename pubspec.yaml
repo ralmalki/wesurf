@@ -31,6 +31,7 @@ dependencies:
   firebase_auth: ^0.18.1+1
   firebase_core: ^0.5.0
   firebase_messaging: ^7.0.2
+  firebase_storage: ^4.0.1
   geolocator: ^6.0.0
   flutter_lorem: ^1.1.0
   map_launcher: ^0.12.0

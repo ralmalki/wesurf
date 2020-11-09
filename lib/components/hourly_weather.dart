@@ -9,15 +9,16 @@ import 'dart:convert';
 
 // Updated Expandable weather widget class
 
-class HourlyWeatherWidget extends StatefulWidget {
-  HourlyWeatherWidget(
-      {this.time,
-      this.temp,
-      this.weatherCode,
-      this.rainChance,
-      this.windSpeed,
-      this.windDegree,
-      this.humidity});
+class HourlyWeatherWidget extends StatefulWidget{
+  HourlyWeatherWidget({
+    this.time,
+    this.temp,
+    this.weatherCode,
+    this.rainChance,
+    this.windSpeed,
+    this.windDegree,
+    this.humidity
+  });
 
   final int time;
   final int temp;
@@ -31,7 +32,8 @@ class HourlyWeatherWidget extends StatefulWidget {
   HourlyWeatherWidgetState createState() => HourlyWeatherWidgetState();
 }
 
-class HourlyWeatherWidgetState extends State<HourlyWeatherWidget> {
+class HourlyWeatherWidgetState extends State<HourlyWeatherWidget>{
+
   Color _textcolor = Colors.black;
   WeatherInfo weatherInfo;
 
@@ -158,7 +160,8 @@ class HourlyWeatherWidgetState extends State<HourlyWeatherWidget> {
             //   ],
             // )
           ],
-        ));
+        )
+    );
   }
 
   @override
@@ -227,7 +230,8 @@ class WeatherInfo {
       return 25;
     else if (rainChance >= 0.50 && rainChance < 0.75)
       return 50;
-    else if (rainChance >= 0.75 && rainChance < 1.00) return 75;
+    else if (rainChance >= 0.75 && rainChance < 1.00)
+      return 75;
     return 100;
   }
 

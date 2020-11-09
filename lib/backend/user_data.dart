@@ -14,7 +14,7 @@ class UserData {
   Future updateOrAddUserName(String name) async {
     return await userCollection
         .doc(uid)
-        .set({"name": name, "favLocations": []});
+        .set({"name": name, "favLocations": [], "auth": true});
   }
 
   Future<String> getUserName() async {
@@ -22,6 +22,22 @@ class UserData {
         FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot documentSnapshot = await documentReference.get();
     return documentSnapshot['name'];
+  }
+
+  //check if user has login before
+  Future<bool> firstTime() async {
+    DocumentReference documentReference =
+      FirebaseFirestore.instance.collection('users').doc(uid);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot['auth'];
+  }
+
+  //get user favorite spots to populate loved-spots page
+  Future<List<dynamic>> getFavSpots() async {
+    DocumentReference documentReference =
+    FirebaseFirestore.instance.collection('users').doc(uid);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot['favLocations'];
   }
 
   Future<bool> addFavLocationToUser(String locationUID) async {

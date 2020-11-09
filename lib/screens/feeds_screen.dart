@@ -3,6 +3,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wesurf/components/forum_comment.dart';
+//import 'forum_comment_screen.dart';
 
 class FeedsScreen extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class FeedsScreen extends StatefulWidget {
 }
 
 class _FeedsScreenState extends State<FeedsScreen> {
+
   Widget getMood(String mood) {
     if (mood == 'happy')
       return Icon(TablerIcons.mood_happy, size: 15, color: Color(0xff4CD964));
@@ -77,7 +79,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
             content,
             59,
             24,
-            120));
+            120
+        ));
       }
     });
 
@@ -102,25 +105,30 @@ class _FeedsScreenState extends State<FeedsScreen> {
           ),
           backgroundColor: Colors.white,
         ),
-        body: Center(
-          child: FutureBuilder(
-            future: fetchPost(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var feedData = snapshot.data;
-                return Container(
-                    color: Color(0xFFF2F2F7),
-                    child: ListView.builder(
-                        itemCount: feedData.length,
-                        itemBuilder: (context, index) {
-                          return feedData[index];
-                        }));
-              } else {
-                return CircularProgressIndicator();
-              }
-            },
-          ),
-        ));
+        backgroundColor: Colors.white,
+      ),
+      body: Center(
+        child: FutureBuilder(
+          future: fetchPost(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var feedData = snapshot.data;
+              return Container(
+                  color: Color(0xFFF2F2F7),
+                  child: ListView.builder(
+                    itemCount: feedData.length,
+                    itemBuilder: (context, index) {
+                      return feedData[index];
+                    }
+                  )
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        ),
+      )
+    );
   }
 
   /* Returns the image asset string for smiley*/
@@ -204,9 +212,7 @@ class _FeedsScreenState extends State<FeedsScreen> {
             children: [
               Expanded(
                   // *Post's text
-                  child: Text(
-                content,
-                style: TextStyle(fontSize: 14),
+                  child: Text(content, style: TextStyle(fontSize: 14),
               ))
             ],
           ),
@@ -217,7 +223,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
               Expanded(
                   flex: 1,
                   // *Post media
-                  child: Image.network(image))
+                  child: Image.network(image)
+              )
             ],
           ),
 

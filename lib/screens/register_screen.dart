@@ -219,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
               await UserData(uid: user.uid)
                   .updateOrAddUserName(nameController.text);
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => OnBoarding()));
+                  MaterialPageRoute(builder: (context) => Login()));
             } on FirebaseAuthException catch (e) {
               if (e.code == 'weak-password') {
                 showAlertDialog(

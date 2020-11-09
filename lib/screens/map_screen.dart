@@ -98,7 +98,9 @@ class _MapScreenState extends State<MapScreen> {
               onMapCreated: (GoogleMapController controller) {
                 mapController = controller;
                 mapController.setMapStyle(_mapStyle);
-                allMarkers.forEach((element) {});
+                allMarkers.forEach((element) {
+                  // print(element.toString());
+                });
               },
               initialCameraPosition: CameraPosition(
                 target: currentLocation,

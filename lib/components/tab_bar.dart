@@ -13,6 +13,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'forum_comment.dart';
+import 'package:wesurf/screens/forum_comment_screen.dart';
 
 class TabBarWidget extends StatefulWidget {
   TabBarWidget(this.id, this.lat, this.long);
@@ -162,7 +163,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
     else if (weatherCode >= 700 && weatherCode <= 799)
       weatherCondition = "foggy";
     else if (weatherCode == 800)
-      weatherCondition = "sunny";
+      weatherCondition = "clear";
     else
       weatherCondition = "cloudy";
 
@@ -511,6 +512,237 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                                   ],
                                 ),
                               ),
+// =======
+//                         ? Container(
+//                         child: Column(children: [
+//                           GestureDetector(
+//                             onTap: () {
+//                               setState(() {
+//                                 moreInfo = !moreInfo;
+//                               });
+//                             },
+//                             child: Column(
+//                               children: [
+//                                 Padding(
+//                                   padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
+//                                   child: Row(children: [
+//                                     Icon(
+//                                       Icons.arrow_back_ios,
+//                                       color: Colors.redAccent,
+//                                     ),
+//                                     Container(
+//                                         child: Text("Back",
+//                                             style: TextStyle(
+//                                                 color: Colors.redAccent,
+//                                                 fontWeight: FontWeight.w700))),
+//                                   ]),
+//                                 ),
+//                                 Container(
+//                                     alignment: Alignment.center,
+//                                     height: MediaQuery.of(context).size.height * 0.08,
+//                                     width: MediaQuery.of(context).size.width * 0.90,
+//                                     padding: EdgeInsets.all(8),
+//                                     child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+//                                       Padding(
+//                                           padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+//                                           child: getWeatherIcon(weatherId, 60)),
+//                                       Padding(
+//                                         padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+//                                         child: Text("${currentTemp.toString()}℃",
+//                                             style: TextStyle(fontSize: 45, fontWeight: FontWeight.w600)),
+//                                       ),
+//                                       Padding(
+//                                         padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+//                                         child: Column(
+//                                             mainAxisAlignment: MainAxisAlignment.center,
+//                                             crossAxisAlignment: CrossAxisAlignment.start,
+//                                             children: [
+//                                               Padding(
+//                                                 padding: const EdgeInsets.all(1.0),
+//                                                 child: Row(children: [
+//                                                   Text(
+//                                                     "High ${tempHigh.toString()}℃ • Low ${tempLow.toString()}℃",
+//                                                     style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+//                                                   ),
+//                                                   Text("")
+//                                                 ]),
+//                                               ),
+//                                               Padding(
+//                                                 padding: const EdgeInsets.all(1.0),
+//                                                 child: Row(children: [
+//                                                   Text("$sky • $skyDesc",
+//                                                       style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
+//                                                   Text("")
+//                                                 ]),
+//                                               )
+//                                             ]),
+//                                       )
+//                                     ]))
+//                               ],
+//                             ),
+//                           ),
+//                           Expanded(
+//                               child: ListView.builder(
+//                                   itemCount: 13,
+//                                   itemBuilder: (context, index) {
+//                                     final hour = data['hourly'][index];
+//                                     // print(hour);
+//                                     int time = hour['dt'];
+//                                     int temp = hour['temp'].toInt();
+//                                     int weatherCode = hour['weather'].elementAt(0)['id'];
+//                                     double chanceOfRain = hour['pop'].toDouble();
+//                                     int windSpeed = (hour['wind_speed']* 3.6).round();
+//                                     int windDeg = hour['wind_deg'];
+//                                     int humidity = hour['humidity'];
+
+//                                     // print("time: $time");
+//                                     // print("temp: $temp");
+//                                     // print("weatherCode: $weatherCode");
+//                                     // print("rain: $chanceOfRain");
+//                                     // print("wind: $windSpeed");
+
+//                                     return HourlyWeatherWidget(
+//                                       time: time, // time of widget info
+//                                       temp: temp, // int temp
+//                                       weatherCode: weatherCode, // main weather descriptor
+//                                       rainChance: chanceOfRain,
+//                                       windSpeed: windSpeed,
+//                                       windDegree: windDeg,
+//                                       humidity: humidity,
+//                                     );
+//                                   }
+//                               )
+//                           ),
+//                         ]))
+//                         : Container(
+//                       //width: 50.0,
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.start,
+//                         //crossAxisAlignment: CrossAxisAlignment.start,
+//                         mainAxisSize: MainAxisSize.min,
+//                         children: [
+//                           Padding(
+//                             padding: const EdgeInsets.only(
+//                                 top: 10.0, bottom: 15.0),
+//                             child: Text(
+//                               "NOW",
+//                               style: TextStyle(
+//                                   fontSize: 18.0,
+//                                   fontWeight: FontWeight.bold,
+//                                   color: Colors.grey),
+//                             ),
+//                           ),
+//                           Padding(
+//                             padding:
+//                                 EdgeInsets.only(top: 10.0, bottom: 15.0),
+//                             child: Row(
+//                               mainAxisAlignment: MainAxisAlignment.center,
+//                               children: [
+//                                 getWeatherIcon(weatherId, 100),
+//                                 Text(
+//                                   "$currentTemp℃",
+//                                   style: TextStyle(fontSize: 90.0),
+//                                 )
+//                               ],
+//                             ),
+//                           ),
+//                           Padding(
+//                             padding: EdgeInsets.only(top: 2.0, bottom: 2.0),
+//                             child: Text("High $tempHigh℃ • Low $tempLow℃",
+//                                 style: TextStyle(fontSize: 18.0)),
+//                           ),
+//                           Padding(
+//                             padding: const EdgeInsets.only(bottom: 15.0),
+//                             child: Text(
+//                               "$sky • $skyDesc",
+//                               style: TextStyle(fontSize: 18.0),
+//                             ),
+//                           ),
+//                           WeatherBreakDown(
+//                             iconData: getRainIcon(pop.toDouble()),
+//                             label: "Chance of Rain",
+//                             result: "$pop%",
+//                           ),
+//                           Container(
+//                             width: 250.0,
+//                             child: Divider(
+//                               color: Colors.black,
+//                             ),
+//                           ),
+//                           WeatherBreakDown(
+//                             iconData: getWindIcon(windDirection),
+//                             label: "Wind",
+//                             result: "$windSpeed km/h",
+//                           ),
+//                           Container(
+//                             width: 250.0,
+//                             child: Divider(
+//                               color: Colors.black,
+//                             ),
+//                           ),
+//                           WeatherBreakDown(
+//                             iconData: Image.asset(
+//                               'assets/humidity.png',
+//                               height: 20,
+//                               width: 20,
+//                               fit: BoxFit.fitWidth
+//                             ),
+//                             label: "Humidity",
+//                             result: "$humidity%",
+//                           ),
+//                           Container(
+//                             width: 250.0,
+//                             child: Divider(
+//                               color: Colors.black,
+//                             ),
+//                           ),
+//                           WeatherBreakDown(
+//                             iconData: Image.asset(
+//                                 'assets/UV-$uv.png',
+//                                 height: 20,
+//                                 width: 20,
+//                                 fit: BoxFit.fitWidth
+//                             ),
+//                             label: "UV",
+//                             result: "$uv",
+//                           ),
+//                           Padding(
+//                             padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+//                             child: Container(
+//                                 child: Text(today(), style: TextStyle(
+//                                     fontSize: 15,
+//                                     color: Colors.grey)
+//                                 )
+//                             ),
+//                           ),
+//                           GestureDetector(
+//                             onTap: () {
+//                               setState(() {
+//                                 moreInfo = !moreInfo;
+//                               });
+//                             },
+//                             child: Padding(
+//                                 padding: EdgeInsets.fromLTRB(0, 8, 8, 6),
+//                                 child: Row(
+//                                   mainAxisAlignment: MainAxisAlignment.end,
+//                                   crossAxisAlignment: CrossAxisAlignment.center,
+//                                   children: [
+//                                     Container(
+//                                         child: Text("Hourly forecast", style: TextStyle(
+//                                             fontSize: 16,
+//                                             color: Colors.redAccent,
+//                                             fontWeight: FontWeight.w700)
+//                                         )
+//                                     ),
+//                                     Icon(Icons.arrow_forward_ios, color: Colors.redAccent)
+//                                   ],
+//                                 )
+//                             ),
+//                           )
+//                         ],
+//                       ),
+//                     ),
+// >>>>>>> code-migrating
                         //Forecast tab================================================
                         Container(
                           child: ListView.builder(
@@ -651,7 +883,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                             hintStyle: TextStyle(fontSize: 12, height: 0.5),
                             enabledBorder: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(20.0)),
+                              BorderRadius.all(Radius.circular(20.0)),
                               borderSide: BorderSide(color: Colors.white),
                             ),
                             labelStyle: TextStyle(fontSize: 12),
@@ -667,7 +899,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
                   onPressed: () {},
                   child: const Text('Post',
                       style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                      TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 ),
               ],
             ),
@@ -776,7 +1008,7 @@ class _TabBarWidgetState extends State<TabBarWidget> {
       String post_time,
       Icon mood_icon) {
     return Table(
-        //defaultColumnWidth:FixedColumnWidth(100),
+      //defaultColumnWidth:FixedColumnWidth(100),
         border: TableBorder.all(
             color: Colors.black26, width: 1, style: BorderStyle.none),
         children: [
@@ -926,4 +1158,5 @@ class WeatherBreakDown extends StatelessWidget {
       ),
     );
   }
+
 }
