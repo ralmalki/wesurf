@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "591358838101",
+    "firebase_url": "https://uowwesurf.firebaseio.com",
+    "project_id": "uowwesurf",
+    "storage_bucket": "uowwesurf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591358838101:android:b10e2ad8ae1e8903379bdc",
+        "android_client_info": {
+          "package_name": "edu.uow.wesurf"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "591358838101-p3t9mqk44egqqg9cuq558ldmskbj61il.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI3OYkbMvqjyCdE2_lObgUT3WwkT0P2BQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "591358838101-p3t9mqk44egqqg9cuq558ldmskbj61il.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "591358838101-m1eu64b2fj9gs9tg01orn3p9rr5nrk21.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "edu.uow.wesurf"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
